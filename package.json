@@ -8,20 +8,20 @@
     "typescript",
     "sql"
   ],
-  "main": "./src/index.js",
-  "types": "./src/index.d.ts",
+  "main": "./dist/src/index.js",
+  "types": "./dist/src/index.d.ts",
   "scripts": {
     "lint": "tslint --project tsconfig.json",
     "build": "tsc",
-    "dependency-check": "dependency-check . --entry bin/schemats.js --missing --no-dev",
-    "test": "npm run lint && npm run build && npm run dependency-check && mocha",
+    "pretest": "npm run lint && npm run build",
+    "test": "mocha",
     "prepublish": "npm run build",
     "clean": "del-cli node_modules **/*.js",
-    "coverage": "npm run lint && npm run build && npm run dependency-check && nyc mocha",
-    "coverage:ci": "npm run lint && npm run build && npm run dependency-check && nyc mocha && nyc report --reporter=text-lcov | coveralls"
+    "coverage": "npm run lint && npm run build && nyc mocha",
+    "coverage:ci": "npm run lint && npm run build && nyc mocha && nyc report --reporter=text-lcov | coveralls"
   },
   "bin": {
-    "schemats": "bin/schemats.js"
+    "schemats": "dist/bin/schemats.js"
   },
   "repository": {
     "type": "git",
@@ -51,7 +51,6 @@
     "@types/yargs": "^12.0.9",
     "coveralls": "^3.0.3",
     "del-cli": "^1.1.0",
-    "dependency-check": "^3.3.0",
     "istanbul": "^0.4.5",
     "mocha": "^6.0.2",
     "nyc": "^13.3.0",

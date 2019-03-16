@@ -7,8 +7,9 @@ import { generateEnumType, generateTableInterface, generateTableTypes } from './
 import { Database, getDatabase } from './schema'
 import Options, { OptionValues } from './options'
 import { Options as ITFOptions, processString } from 'typescript-formatter'
+import * as path from 'path'
 
-const pkgVersion = require('../package.json').version
+const pkgVersion = require(path.resolve(__dirname, '../../package.json')).version
 
 function getTime () {
     let padTime = (value: number) => `0${value}`.slice(-2)

@@ -20,7 +20,7 @@ interface SchematsConfig {
 let argv: SchematsConfig = yargs
     .usage('Usage: $0 <command> [options]')
     .global('config')
-    .default('config', 'schemats.json')
+    .default('config', '../schemats.json')
     .config()
     .env('SCHEMATS')
     .command('generate', 'generate type definition')
