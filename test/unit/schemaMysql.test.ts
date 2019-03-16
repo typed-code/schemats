@@ -17,12 +17,15 @@ describe('MysqlDatabase', () => {
         sandbox.stub(MysqlDBReflection.prototype, 'queryAsync');
         db = new MysqlDatabase('mysql://user:password@localhost/test');
     });
+
     beforeEach(() => {
         sandbox.reset();
     });
+
     after(() => {
         sandbox.restore();
     });
+
     describe('query', () => {
         it('query calls query async', async () => {
             await db.query('SELECT * FROM test_table');
@@ -31,13 +34,16 @@ describe('MysqlDatabase', () => {
             ]);
         });
     });
+
     describe('queryAsync', () => {
         before(() => {
             MysqlDBReflection.prototype.queryAsync.restore();
         });
+
         after(() => {
             sandbox.stub(MysqlDBReflection.prototype, 'queryAsync');
         });
+
         it('query has error', async () => {
             (mysql.createConnection as any).returns({
                 query: function query(
@@ -69,7 +75,29 @@ describe('MysqlDatabase', () => {
             const results = await testDb.query('SELECT * FROM test_table');
             assert.deepStrictEqual(results, []);
         });
+
+        it('query returns results with columns as lower-case', async () => {
+            (mysql.createConnection as any).returns({
+                query: function query(
+                    queryString: string,
+                    params: any[],
+                    cb: (err: any, data: any) => void
+                ) {
+                    cb(null, [
+                        { COLUMN_1: 'val1', COLUMN_2: 'val1' },
+                        { COLUMN_1: 'val2', COLUMN_2: 'val2' },
+                    ]);
+                },
+            });
+            const testDb: any = new MysqlDatabase('mysql://user:password@localhost/test');
+            const results = await testDb.query('SELECT * FROM test_table');
+            assert.deepStrictEqual(results, [
+                { column_1: 'val1', column_2: 'val1' },
+                { column_1: 'val2', column_2: 'val2' },
+            ]);
+        });
     });
+
     describe('getEnumTypes', () => {
         it('writes correct query with schema name', async () => {
             MysqlDBReflection.prototype.queryAsync.returns(Promise.resolve([]));
