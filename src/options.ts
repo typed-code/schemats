@@ -14,7 +14,7 @@ export default class Options {
     public options: OptionValues
 
     constructor (options: OptionValues = {}) {
-        this.options = {...DEFAULT_OPTIONS, ...options}
+        this.options = { ...DEFAULT_OPTIONS, ...options }
     }
 
     transformTypeName (typename: string) {

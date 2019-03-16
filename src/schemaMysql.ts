@@ -1,19 +1,18 @@
-import * as mysql from 'mysql'
-import { mapValues, keys, isEqual } from 'lodash'
+import { Connection, createConnection, MysqlError } from 'mysql'
+import { isEqual, keys, mapValues } from 'lodash'
 import { parse as urlParse } from 'url'
-import { TableDefinition, Database } from './schemaInterfaces'
+import { Database, TableDefinition } from './schemaInterfaces'
 import Options from './options'
 
 export class MysqlDatabase implements Database {
-    private db: mysql.IConnection
-    private defaultSchema: string
+    private db: Connection
+    private readonly defaultSchema: string
 
     constructor (public connectionString: string) {
-        this.db = mysql.createConnection(connectionString)
+        this.db = createConnection(connectionString)
         let url = urlParse(connectionString, true)
         if (url && url.pathname) {
-            let database = url.pathname.substr(1)
-            this.defaultSchema = database
+            this.defaultSchema = url.pathname.substr(1)
         } else {
             this.defaultSchema = 'public'
         }
@@ -163,7 +162,7 @@ export class MysqlDatabase implements Database {
 
     public queryAsync (queryString: string, escapedValues?: Array<string>): Promise<Object[]> {
         return new Promise((resolve, reject) => {
-            this.db.query(queryString, escapedValues, (error: Error, results: Array<Object>) => {
+            this.db.query(queryString, escapedValues, (error: MysqlError, results: Array<Object>) => {
                 if (error) {
                     return reject(error)
                 }

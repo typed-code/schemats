@@ -40,7 +40,7 @@ describe('schemat generation integration testing', () => {
             db = getDatabase(`${process.env.MYSQL_URL}?multipleStatements=true`)
             await loadSchema(db, './test/fixture/mysql/initCleanup.sql')
         })
-        it ('Basic generation', async () => {
+        it('Basic generation', async () => {
             const inputSQLFile = 'test/fixture/mysql/osm.sql'
             const outputFile = './test/actual/mysql/osm.ts'
             const expectedFile = './test/expected/mysql/osm.ts'

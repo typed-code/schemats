@@ -1,6 +1,5 @@
 import * as PgPromise from 'pg-promise'
-import { mapValues } from 'lodash'
-import { keys } from 'lodash'
+import { mapValues, keys } from 'lodash'
 import Options from './options'
 
 import { TableDefinition, Database } from './schemaInterfaces'
@@ -141,7 +140,7 @@ export class PostgresDatabase implements Database {
     }
 
     public async getSchemaTables (schemaName: string): Promise<string[]> {
-        return await this.db.map<string>(
+        return this.db.map<string>(
             'SELECT table_name ' +
             'FROM information_schema.columns ' +
             'WHERE table_schema = $1 ' +

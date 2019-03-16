@@ -6,16 +6,15 @@
 
 import * as yargs from 'yargs'
 import * as fs from 'fs'
-import { typescriptOfSchema, getDatabase } from '../src/index'
-import Options from '../src/options'
+import { typescriptOfSchema } from '../src/index'
 
 interface SchematsConfig {
     conn: string,
-    table: string[] | string,
-    schema: string,
     output: string,
-    camelCase: boolean,
-    noHeader: boolean,
+    table?: string[] | string,
+    schema?: string,
+    camelCase?: boolean,
+    noHeader?: boolean,
 }
 
 let argv: SchematsConfig = yargs
@@ -47,7 +46,7 @@ let argv: SchematsConfig = yargs
     .describe('o', 'output file name')
     .help('h')
     .alias('h', 'help')
-    .argv;
+    .argv as SchematsConfig;
 
 (async () => {
 
@@ -61,7 +60,10 @@ let argv: SchematsConfig = yargs
         }
 
         let formattedOutput = await typescriptOfSchema(
-            argv.conn, argv.table, argv.schema, { camelCase: argv.camelCase, writeHeader: !argv.noHeader })
+            argv.conn, argv.table, argv.schema, {
+                camelCase: argv.camelCase,
+                writeHeader: !argv.noHeader
+            })
         fs.writeFileSync(argv.output, formattedOutput)
 
     } catch (e) {

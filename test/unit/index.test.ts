@@ -8,7 +8,7 @@ import Options, { OptionValues } from '../../src/options'
 const options: OptionValues = {}
 
 describe('index', () => {
-    const typedTableSandbox = sinon.sandbox.create()
+    const typedTableSandbox = sinon.createSandbox()
     const db = {
         getDefaultSchema: typedTableSandbox.stub(),
         getTableTypes: typedTableSandbox.stub(),
@@ -35,17 +35,17 @@ describe('index', () => {
         it('calls functions with correct params', async () => {
             dbReflection.getTableTypes.returns(Promise.resolve('tableTypes'))
             await Index.typescriptOfTable(db, 'tableName', 'schemaName', new Options(options))
-            assert.deepEqual(dbReflection.getTableTypes.getCall(0).args, [
+            assert.deepStrictEqual(dbReflection.getTableTypes.getCall(0).args, [
                 'tableName',
                 'schemaName',
                 new Options(options)
             ])
-            assert.deepEqual(tsReflection.generateTableTypes.getCall(0).args, [
+            assert.deepStrictEqual(tsReflection.generateTableTypes.getCall(0).args, [
                 'tableName',
                 'tableTypes',
                 new Options(options)
             ])
-            assert.deepEqual(tsReflection.generateTableInterface.getCall(0).args, [
+            assert.deepStrictEqual(tsReflection.generateTableInterface.getCall(0).args, [
                 'tableName',
                 'tableTypes',
                 new Options(options)
@@ -56,7 +56,7 @@ describe('index', () => {
             tsReflection.generateTableTypes.returns('generatedTableTypes\n')
             tsReflection.generateTableInterface.returns('generatedTableInterfaces\n')
             const typescriptString = await Index.typescriptOfTable(db, 'tableName', 'schemaName', new Options(options))
-            assert.equal(typescriptString, 'generatedTableTypes\ngeneratedTableInterfaces\n')
+            assert.strictEqual(typescriptString, 'generatedTableTypes\ngeneratedTableInterfaces\n')
         })
     })
     describe('typescriptOfSchema', () => {
@@ -67,10 +67,10 @@ describe('index', () => {
             tsReflection.generateEnumType.returns('generatedEnumTypes\n')
             const tsOfSchema = await Index.typescriptOfSchema(db, [], 'schemaName', options)
 
-            assert.deepEqual(dbReflection.getSchemaTables.getCall(0).args[0], 'schemaName')
-            assert.deepEqual(dbReflection.getEnumTypes.getCall(0).args[0], 'schemaName')
-            assert.deepEqual(tsReflection.generateEnumType.getCall(0).args[0], 'enumTypes')
-            assert.deepEqual(tsReflection.generateTableTypes.getCall(0).args[0], 'tablename')
+            assert.deepStrictEqual(dbReflection.getSchemaTables.getCall(0).args[0], 'schemaName')
+            assert.deepStrictEqual(dbReflection.getEnumTypes.getCall(0).args[0], 'schemaName')
+            assert.deepStrictEqual(tsReflection.generateEnumType.getCall(0).args[0], 'enumTypes')
+            assert.deepStrictEqual(tsReflection.generateTableTypes.getCall(0).args[0], 'tablename')
         })
         it('has tables provided', async () => {
             dbReflection.getSchemaTables.returns(Promise.resolve(['tablename']))
@@ -80,8 +80,8 @@ describe('index', () => {
             const tsOfSchema = await Index.typescriptOfSchema(db, ['differentTablename'], null, options)
 
             assert(!dbReflection.getSchemaTables.called)
-            assert.deepEqual(tsReflection.generateEnumType.getCall(0).args[0], 'enumTypes')
-            assert.deepEqual(tsReflection.generateTableTypes.getCall(0).args[0], 'differentTablename')
+            assert.deepStrictEqual(tsReflection.generateEnumType.getCall(0).args[0], 'enumTypes')
+            assert.deepStrictEqual(tsReflection.generateTableTypes.getCall(0).args[0], 'differentTablename')
         })
     })
 })

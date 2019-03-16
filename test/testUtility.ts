@@ -43,7 +43,7 @@ export async function loadSchema (db: Database, file: string) {
     let query = await fs.readFile(file, {
         encoding: 'utf8'
     })
-    return await db.query(query)
+    return db.query(query)
 }
 
 export async function writeTsFile (inputSQLFile: string, inputConfigFile: string, outputFile: string, db: Database) {
