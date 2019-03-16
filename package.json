@@ -1,6 +1,6 @@
 {
-  "name": "schemats",
-  "version": "3.0.3",
+  "name": "@typed-code/schemats",
+  "version": "4.0.0",
   "description": "Generate typescript interface definitions from (postgres) SQL database schema",
   "keywords": [
     "postgres",
@@ -25,10 +25,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/sweetiq/schemats.git"
+    "url": "https://github.com/typed-code/schemats.git"
   },
   "bugs": {
-    "url": "https://github.com/sweetiq/schemats/issues"
+    "url": "https://github.com/typed-code/schemats/issues"
   },
   "author": "Mengxuan Xia <xiamx2004@gmail.com>",
   "contributors": [

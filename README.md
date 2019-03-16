@@ -1,11 +1,13 @@
-# Schemats
+# SchemaTS
 
 [![npm](https://img.shields.io/npm/v/schemats.svg)](https://www.npmjs.com/package/schemats)
-[![GitHub tag](https://img.shields.io/github/tag/SweetIQ/schemats.svg)](https://github.com/SweetIQ/schemats)
-[![TravisCI Build Status](https://travis-ci.org/SweetIQ/schemats.svg?branch=master)](https://travis-ci.org/SweetIQ/schemats)
-[![Coverage Status](https://coveralls.io/repos/github/SweetIQ/schemats/badge.svg?branch=coverage)](https://coveralls.io/github/SweetIQ/schemats?branch=coverage)
+[![GitHub tag](https://img.shields.io/github/tag/typed-code/schemats.svg)](https://github.com/typed-code/schemats)
+[![TravisCI Build Status](https://travis-ci.org/typed-code/schemats.svg?branch=master)](https://travis-ci.org/typed-code/schemats)
+[![Coverage Status](https://coveralls.io/repos/github/typed-code/schemats/badge.svg?branch=coverage)](https://coveralls.io/github/typed-code/schemats?branch=coverage)
 
-Using Schemats, you can generate TypeScript interface definitions from (Postgres, MySQL) SQL database schema automatically.
+**This is a fork of [SweetIQ/schemats](https://github.com/SweetIQ/schemats) which is not maintained anymore.**
+
+Using SchemaTS, you can generate TypeScript interface definitions from (Postgres, MySQL) SQL database schema automatically.
 
 Start with a database schema: 
 
@@ -39,10 +41,10 @@ For an overview on the motivation and rational behind this project, please take 
 
 ## Quick Start
 
-### Installing Schemats
+### Installing SchemaTS
 
 ```
-npm install -g schemats
+npm install -g @typed-code/schemats
 ```
 
 ### Generating the type definition from schema
@@ -76,7 +78,7 @@ schemats generate -c mysql://mysql@localhost/osm -o osm.ts
 
 ### Using schemats.json config file 
 
-Schemats supports reading configuration from a json config file (defaults to `schemats.json`). Instead of passing configuration via commandline parameter like done above, it is also possible to supply the configuration through a config file. The config file supports the same parameters as the commandline arguments.
+SchemaTS supports reading configuration from a json config file (defaults to `schemats.json`). Instead of passing configuration via commandline parameter like done above, it is also possible to supply the configuration through a config file. The config file supports the same parameters as the commandline arguments.
 
 For example, if a `schemats.json` exists in the current working directory with the following content:
 
@@ -124,7 +126,7 @@ With generated type definition for our database schema, we can write code with a
 
 ### Using schemats as a library
 
-Schemats exposes two high-level functions for generating typescript definition from a database schema. They can be used by a build tool such as grunt and gulp.
+SchemaTS exposes two high-level functions for generating typescript definition from a database schema. They can be used by a build tool such as grunt and gulp.
 
 ### Upgrading to v1.0
 
