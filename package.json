@@ -11,7 +11,7 @@
   "main": "./dist/src/index.js",
   "types": "./dist/src/index.d.ts",
   "scripts": {
-    "lint": "tslint --project tsconfig.json",
+    "lint": "tslint --project tsconfig.json --fix",
     "build": "tsc",
     "pretest": "npm run lint && npm run build",
     "test": "mocha",
@@ -55,12 +55,13 @@
     "mocha": "^6.0.2",
     "nyc": "^13.3.0",
     "power-assert": "^1.6.1",
+    "prettier": "^1.16.4",
     "proxyquire": "^2.1.0",
     "sinon": "^7.2.7",
     "source-map-support": "^0.5.11",
     "ts-node": "^8.0.3",
     "tslint": "^5.14.0",
-    "tslint-config-standard": "^8.0.1"
+    "tslint-config-prettier": "^1.18.0"
   },
   "dependencies": {
     "bluebird": "^3.5.3",

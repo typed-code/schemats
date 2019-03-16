@@ -65,7 +65,6 @@ export namespace UsersFields {
     export type jsonArrayCol = Array<Object> | null;
     export type jsonbArrayCol = Array<Object> | null;
     export type timestamptzArrayCol = Array<Date> | null;
-
 }
 
 export interface Users {
@@ -130,5 +129,4 @@ export interface Users {
     jsonArrayCol: UsersFields.jsonArrayCol;
     jsonbArrayCol: UsersFields.jsonbArrayCol;
     timestamptzArrayCol: UsersFields.timestamptzArrayCol;
-
 }

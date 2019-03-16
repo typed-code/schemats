@@ -65,7 +65,6 @@ export namespace usersFields {
     export type nullable_enum_col = enum_nullable_enum_col | null;
     export type set_col = set_set_col;
     export type nullable_set_col = set_nullable_set_col | null;
-
 }
 
 export interface users {
@@ -128,7 +127,6 @@ export interface users {
     nullable_enum_col: usersFields.nullable_enum_col;
     set_col: usersFields.set_col;
     nullable_set_col: usersFields.nullable_set_col;
-
 }
 
 export namespace user_enumsFields {
@@ -136,7 +134,6 @@ export namespace user_enumsFields {
     export type nullable_enum_col = enum_nullable_enum_col | null;
     export type set_col = set_set_col;
     export type nullable_set_col = set_nullable_set_col | null;
-
 }
 
 export interface user_enums {
@@ -144,17 +141,14 @@ export interface user_enums {
     nullable_enum_col: user_enumsFields.nullable_enum_col;
     set_col: user_enumsFields.set_col;
     nullable_set_col: user_enumsFields.nullable_set_col;
-
 }
 
 export namespace packageFields {
     export type number_ = number;
     export type string_ = string;
-
 }
 
 export interface package_ {
     number: packageFields.number_;
     string: packageFields.string_;
-
 }

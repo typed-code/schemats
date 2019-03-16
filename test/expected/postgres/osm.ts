@@ -65,7 +65,6 @@ export namespace usersFields {
     export type json_array_col = Array<Object> | null;
     export type jsonb_array_col = Array<Object> | null;
     export type timestamptz_array_col = Array<Date> | null;
-
 }
 
 export interface users {

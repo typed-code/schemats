@@ -4,20 +4,20 @@
  * Created by xiamx on 2016-08-10.
  */
 
-import * as yargs from 'yargs'
-import * as fs from 'fs'
-import { typescriptOfSchema } from '../src/index'
+import * as fs from 'fs';
+import * as yargs from 'yargs';
+import { typescriptOfSchema } from '../src';
 
 interface SchematsConfig {
-    conn: string,
-    output: string,
-    table?: string[] | string,
-    schema?: string,
-    camelCase?: boolean,
-    noHeader?: boolean,
+    conn: string;
+    output: string;
+    table?: string[] | string;
+    schema?: string;
+    camelCase?: boolean;
+    noHeader?: boolean;
 }
 
-let argv: SchematsConfig = yargs
+const argv: SchematsConfig = yargs
     .usage('Usage: $0 <command> [options]')
     .global('config')
     .default('config', '../schemats.json')
@@ -25,8 +25,10 @@ let argv: SchematsConfig = yargs
     .env('SCHEMATS')
     .command('generate', 'generate type definition')
     .demand(1)
-    // tslint:disable-next-line
-    .example('$0 generate -c postgres://username:password@localhost/db -t table1 -t table2 -s schema -o interface_output.ts', 'generate typescript interfaces from schema')
+    .example(
+        '$0 generate -c postgres://username:password@localhost/db -t table1 -t table2 -s schema -o interface_output.ts',
+        'generate typescript interfaces from schema'
+    )
     .demand('c')
     .alias('c', 'conn')
     .nargs('c', 1)
@@ -45,35 +47,28 @@ let argv: SchematsConfig = yargs
     .alias('o', 'output')
     .describe('o', 'output file name')
     .help('h')
-    .alias('h', 'help')
-    .argv as SchematsConfig;
+    .alias('h', 'help').argv as SchematsConfig;
 
 (async () => {
-
     try {
         if (!Array.isArray(argv.table)) {
-            if (!argv.table) {
-                argv.table = []
-            } else {
-                argv.table = [argv.table]
-            }
+            argv.table = !argv.table ? [] : [argv.table];
         }
 
-        let formattedOutput = await typescriptOfSchema(
-            argv.conn, argv.table, argv.schema, {
-                camelCase: argv.camelCase,
-                writeHeader: !argv.noHeader
-            })
-        fs.writeFileSync(argv.output, formattedOutput)
-
+        const formattedOutput = await typescriptOfSchema(argv.conn, argv.table, argv.schema, {
+            camelCase: argv.camelCase,
+            writeHeader: !argv.noHeader,
+        });
+        fs.writeFileSync(argv.output, formattedOutput);
     } catch (e) {
-        console.error(e)
-        process.exit(1)
+        console.error(e);
+        process.exit(1);
     }
-
-})().then(() => {
-    process.exit()
-}).catch((e: any) => {
-    console.warn(e)
-    process.exit(1)
-})
+})()
+    .then(() => {
+        process.exit();
+    })
+    .catch((e: any) => {
+        console.warn(e);
+        process.exit(1);
+    });

@@ -1,9 +1,24 @@
 {
-    "extends": "tslint-config-standard",
-    "rules": {
-        "ter-indent": [true, 4, {"SwitchCase": 1}],
-        "no-trailing-whitespace": false,
-        "max-line-length": [0],
-        "align": [true, "parameters", "statements"]
-    }
+  "extends": [
+    "tslint:latest",
+    "tslint-config-prettier"
+  ],
+  "rules": {
+    "interface-name": false,
+    "no-submodule-imports": false,
+    "no-var-requires": false,
+    "object-literal-sort-keys": false,
+    "member-ordering": false,
+    "no-console": [true, "log"],
+    "no-implicit-dependencies": [true, "dev"],
+    "quotemark": [
+      true,
+      "single"
+    ],
+    "indent": [
+      true,
+      "spaces",
+      4
+    ]
+  }
 }

@@ -1,15 +1,15 @@
-import * as osm from '../../expected/postgres/osm'
-import * as PgPromise from 'pg-promise'
+import * as PgPromise from 'pg-promise';
+import * as osm from '../../expected/postgres/osm';
 
-const pgp = PgPromise()
+const pgp = PgPromise();
 const db = pgp('postgres://username:password@host:port/databaset');
 
-// tslint:disable
 (async () => {
-    let emailAndDisplayName: {
-        email: osm.users['email']
-        display_name: osm.users['display_name']
-    } = await db.query('SELECT (email, display_name) FROM users')
+    const emailAndDisplayName: {
+        email: osm.users['email'];
+        display_name: osm.users['display_name'];
+    } = await db.query('SELECT (email, display_name) FROM users');
 
-    console.log(emailAndDisplayName)
-})()
+    // tslint:disable-next-line
+    console.log(emailAndDisplayName);
+})();
