@@ -73,17 +73,5 @@
     "typescript": "^3.3.3333",
     "typescript-formatter": "^7.2.2",
     "yargs": "^13.2.2"
-  },
-  "nyc": {
-    "extension": [
-      ".ts",
-      ".tsx"
-    ],
-    "exclude": [
-      "**/*.d.ts"
-    ],
-    "require": [
-      "ts-node/register"
-    ]
   }
 }
