@@ -12,7 +12,7 @@ describe('schemats cli tool integration testing', () => {
             const { status, stdout, stderr } = spawnSync(
                 'node',
                 [
-                    'bin/schemats',
+                    'dist/bin/schemats',
                     'generate',
                     '-c',
                     process.env.POSTGRES_URL as string,
@@ -35,7 +35,7 @@ describe('schemats cli tool integration testing', () => {
         });
         it('should run without error', () => {
             const { status } = spawnSync('node', [
-                'bin/schemats',
+                'dist/bin/schemats',
                 'generate',
                 '-c',
                 process.env.MYSQL_URL as string,
