@@ -1,4 +1,5 @@
 import * as fs from 'mz/fs';
+import * as path from 'path';
 import * as ts from 'typescript';
 import { Database, typescriptOfSchema } from '../src';
 
@@ -19,8 +20,8 @@ export function compile(fileNames: string[], options: ts.CompilerOptions): boole
 }
 
 export async function compare(goldStandardFile: string, outputFile: string): Promise<boolean> {
-    const gold = await fs.readFile(goldStandardFile, { encoding: 'utf8' });
-    const actual = await fs.readFile(outputFile, { encoding: 'utf8' });
+    const gold = await fs.readFile(path.resolve(goldStandardFile), { encoding: 'utf8' });
+    const actual = await fs.readFile(path.resolve(outputFile), { encoding: 'utf8' });
 
     const diffs = diff.diffLines(gold, actual, { ignoreWhitespace: true, newlineIsToken: true });
 
@@ -39,7 +40,7 @@ export async function compare(goldStandardFile: string, outputFile: string): Pro
 }
 
 export async function loadSchema(db: Database, file: string) {
-    const query = await fs.readFile(file, {
+    const query = await fs.readFile(path.resolve(file), {
         encoding: 'utf8',
     });
     return db.query(query);
@@ -52,10 +53,10 @@ export async function writeTsFile(
     db: Database
 ) {
     await loadSchema(db, inputSQLFile);
-    const config: any = require(inputConfigFile);
+    const config: any = require(path.resolve(inputConfigFile));
     const formattedOutput = await typescriptOfSchema(db, config.tables, config.schema, {
         camelCase: config.camelCase,
         writeHeader: config.writeHeader,
     });
-    await fs.writeFile(outputFile, formattedOutput);
+    await fs.writeFile(path.resolve(outputFile), formattedOutput);
 }
