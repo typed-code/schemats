@@ -93,7 +93,7 @@ export class MysqlDatabase implements Database {
     }
 
     private static getEnumNameFromColumn(dataType: string, columnName: string): string {
-        return `${dataType}_${columnName}`;
+        return `${columnName}_${dataType}`;
     }
 
     public query(queryString: string) {
@@ -101,7 +101,6 @@ export class MysqlDatabase implements Database {
     }
 
     public async getEnumTypes(schema?: string) {
-        const enums: any = {};
         let enumSchemaWhereClause: string;
         let params: string[];
         if (schema) {
@@ -112,34 +111,56 @@ export class MysqlDatabase implements Database {
             params = [];
         }
         const rawEnumRecords = await this.queryAsync(
-            'SELECT column_name, column_type, data_type ' +
+            'SELECT table_name, column_name, column_type, data_type ' +
                 'FROM information_schema.columns ' +
                 `WHERE data_type IN ('enum', 'set') ${enumSchemaWhereClause}`,
             params
         );
-        rawEnumRecords.forEach(
-            (enumItem: { column_name: string; column_type: string; data_type: string }) => {
+
+        const groupedEnums = rawEnumRecords.reduce(
+            (
+                grouped: { [key: string]: { values: string[][]; tables: string[] } },
+                enumItem: {
+                    data_type: string;
+                    column_name: string;
+                    column_type: string;
+                    table_name: string;
+                }
+            ) => {
                 const enumName = MysqlDatabase.getEnumNameFromColumn(
                     enumItem.data_type,
                     enumItem.column_name
                 );
                 const enumValues = MysqlDatabase.parseMysqlEnumeration(enumItem.column_type);
-                if (enums[enumName] && !isEqual(enums[enumName], enumValues)) {
-                    const errorMsg =
-                        `Multiple enums with the same name and contradicting types were found: ` +
-                        `${enumItem.column_name}: ${JSON.stringify(
-                            enums[enumName]
-                        )} and ${JSON.stringify(enumValues)}`;
-                    throw new Error(errorMsg);
+
+                grouped[enumName] = grouped[enumName] || { values: [], tables: [] };
+
+                if (grouped[enumName].values.every(vals => !isEqual(vals, enumValues))) {
+                    grouped[enumName].values.push(enumValues);
+                    grouped[enumName].tables.push(enumItem.table_name);
                 }
-                enums[enumName] = enumValues;
-            }
+
+                return grouped;
+            },
+            {}
         );
-        return enums;
+
+        return Object.entries(groupedEnums).reduce((result: any, [key, entry]) => {
+            if (entry.values.length > 1) {
+                entry.values.forEach((vals: string[], idx: number) => {
+                    result[`${entry.tables[idx]}_${key}`] = vals;
+                });
+            } else {
+                result[key] = entry.values.pop();
+            }
+            return result;
+        }, {});
     }
 
     public async getTableDefinition(tableName: string, tableSchema: string) {
         const tableDefinition: TableDefinition = {};
+
+        const enumNames = await this.getEnumTypes(tableSchema);
 
         const tableColumns = await this.queryAsync(
             'SELECT column_name, data_type, is_nullable ' +
@@ -151,9 +172,14 @@ export class MysqlDatabase implements Database {
             (schemaItem: { column_name: string; data_type: string; is_nullable: string }) => {
                 const columnName = schemaItem.column_name;
                 const dataType = schemaItem.data_type;
+
+                const enumName = MysqlDatabase.getEnumNameFromColumn(dataType, columnName);
+
                 tableDefinition[columnName] = {
                     udtName: /^(enum|set)$/i.test(dataType)
-                        ? MysqlDatabase.getEnumNameFromColumn(dataType, columnName)
+                        ? enumNames.hasOwnProperty(enumName)
+                            ? enumName
+                            : `${tableName}_${enumName}`
                         : dataType,
                     nullable: schemaItem.is_nullable === 'YES',
                 };
