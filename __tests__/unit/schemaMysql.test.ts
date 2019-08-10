@@ -1,4 +1,3 @@
-import * as assert from 'assert';
 import * as mysql from 'mysql';
 import Options from '../../src/options';
 import { TableDefinition } from '../../src/schemaInterfaces';
@@ -9,80 +8,61 @@ const options = new Options({});
 const MysqlDBReflection = MysqlDatabase as any;
 
 describe('MysqlDatabase', () => {
-  let db: MysqlDatabase;
+  let db: any;
+  let mysqlProxy: MysqlDatabase;
   let spies: any;
 
   beforeAll(() => {
-    spies = {
-      createConnection: jest.spyOn(mysql, 'createConnection'),
-      queryAsync: jest.spyOn(MysqlDBReflection.prototype, 'queryAsync'),
-    };
-
-    db = new MysqlDatabase('mysql://user:password@localhost/test');
-  });
-
-  beforeEach(() => {
-    Object.keys(spies).forEach(key => spies[key].mockClear());
+    db = mysql.createConnection('');
+    mysqlProxy = new MysqlDatabase('mysql://user:password@localhost/test');
   });
 
   describe('query', () => {
     it('query calls query async', async () => {
-      await db.query('SELECT * FROM test_table');
-      assert.deepStrictEqual(MysqlDBReflection.prototype.queryAsync.getCall(0).args, [
+      db.mysqlStub.withResults([]);
+
+      await mysqlProxy.query('SELECT * FROM test_table');
+
+      expect(db.mysqlStub.query).toHaveBeenCalledWith(
         'SELECT * FROM test_table',
-      ]);
+        undefined,
+        expect.any(Function)
+      );
     });
   });
 
   describe('queryAsync', () => {
-    beforeAll(() => {
-      MysqlDBReflection.prototype.queryAsync.restore();
-    });
-
     it('query has error', async () => {
-      (mysql.createConnection as any).returns({
-        query: function query(queryString: string, params: any[], cb: (error: string) => void) {
-          cb('ERROR');
-        },
-      });
+      db.mysqlStub.withError('ERROR');
+
       const testDb: any = new MysqlDatabase('mysql://user:password@localhost/test');
       try {
-        testDb.query('SELECT * FROM test_table');
+        await testDb.query('SELECT * FROM test_table');
       } catch (e) {
-        assert.strictEqual(e, 'ERROR');
+        expect(e).toEqual('ERROR');
       }
     });
+
     it('query returns with results', async () => {
-      (mysql.createConnection as any).returns({
-        query: function query(
-          queryString: string,
-          params: any[],
-          cb: (err: any, value: any) => void
-        ) {
-          cb(null, []);
-        },
-      });
+      db.mysqlStub.withResults([]);
+
       const testDb: any = new MysqlDatabase('mysql://user:password@localhost/test');
       const results = await testDb.query('SELECT * FROM test_table');
-      assert.deepStrictEqual(results, []);
+      expect(results).toEqual([]);
     });
 
     it('query returns results with columns as lower-case', async () => {
-      (mysql.createConnection as any).returns({
-        query: function query(
-          queryString: string,
-          params: any[],
-          cb: (err: any, data: any) => void
-        ) {
-          cb(null, [
-            { COLUMN_1: 'val1', COLUMN_2: 'val1' },
-            { COLUMN_1: 'val2', COLUMN_2: 'val2' },
-          ]);
+      db.mysqlStub.withResults([
+        { COLUMN_1: 'val1', COLUMN_2: 'val1' },
+        {
+          COLUMN_1: 'val2',
+          COLUMN_2: 'val2',
         },
-      });
+      ]);
+
       const testDb: any = new MysqlDatabase('mysql://user:password@localhost/test');
       const results = await testDb.query('SELECT * FROM test_table');
-      assert.deepStrictEqual(results, [
+      expect(results).toEqual([
         { column_1: 'val1', column_2: 'val1' },
         { column_1: 'val2', column_2: 'val2' },
       ]);
@@ -91,127 +71,135 @@ describe('MysqlDatabase', () => {
 
   describe('getEnumTypes', () => {
     it('writes correct query with schema name', async () => {
-      MysqlDBReflection.prototype.queryAsync.returns(Promise.resolve([]));
-      await db.getEnumTypes('testschema');
-      assert.deepStrictEqual(MysqlDBReflection.prototype.queryAsync.getCall(0).args, [
+      db.mysqlStub.withResults([]);
+
+      await mysqlProxy.getEnumTypes('testschema');
+      expect(db.mysqlStub.query).toHaveBeenCalledWith(
         'SELECT column_name, column_type, data_type ' +
           'FROM information_schema.columns ' +
           `WHERE data_type IN ('enum', 'set') and table_schema = ?`,
         ['testschema'],
-      ]);
+        expect.any(Function)
+      );
     });
+
     it('writes correct query without schema name', async () => {
-      MysqlDBReflection.prototype.queryAsync.returns(Promise.resolve([]));
-      await db.getEnumTypes();
-      assert.deepStrictEqual(MysqlDBReflection.prototype.queryAsync.getCall(0).args, [
+      db.mysqlStub.withResults([]);
+
+      await mysqlProxy.getEnumTypes();
+      expect(db.mysqlStub.query).toHaveBeenCalledWith(
         'SELECT column_name, column_type, data_type ' +
           'FROM information_schema.columns ' +
           `WHERE data_type IN ('enum', 'set') `,
         [],
-      ]);
-    });
-    it('handles response', async () => {
-      MysqlDBReflection.prototype.queryAsync.returns(
-        Promise.resolve([
-          { column_name: 'column1', column_type: `enum('enum1')`, data_type: 'enum' },
-          { column_name: 'column2', column_type: `set('set1')`, data_type: 'set' },
-        ])
+        expect.any(Function)
       );
-      const enumTypes = await db.getEnumTypes('testschema');
-      assert.deepStrictEqual(enumTypes, {
+    });
+
+    it('handles response', async () => {
+      db.mysqlStub.withResults([
+        { column_name: 'column1', column_type: `enum('enum1')`, data_type: 'enum' },
+        { column_name: 'column2', column_type: `set('set1')`, data_type: 'set' },
+      ]);
+
+      const enumTypes = await mysqlProxy.getEnumTypes('testschema');
+      expect(enumTypes).toEqual({
         enum_column1: ['enum1'],
         set_column2: ['set1'],
       });
     });
+
     it('same column same value is accepted', async () => {
-      MysqlDBReflection.prototype.queryAsync.returns(
-        Promise.resolve([
-          {
-            column_name: 'column1',
-            column_type: `enum('enum1','enum2')`,
-            data_type: 'enum',
-          },
-          {
-            column_name: 'column1',
-            column_type: `enum('enum1','enum2')`,
-            data_type: 'enum',
-          },
-        ])
-      );
-      const enumTypes = await db.getEnumTypes('testschema');
-      assert.deepStrictEqual(enumTypes, {
+      db.mysqlStub.withResults([
+        { column_name: 'column1', column_type: `enum('enum1','enum2')`, data_type: 'enum' },
+        { column_name: 'column1', column_type: `enum('enum1','enum2')`, data_type: 'enum' },
+      ]);
+
+      const enumTypes = await mysqlProxy.getEnumTypes('testschema');
+      expect(enumTypes).toEqual({
         enum_column1: ['enum1', 'enum2'],
       });
     });
+
     it('same column different value conflict', async () => {
-      MysqlDBReflection.prototype.queryAsync.returns(
-        Promise.resolve([
-          { column_name: 'column1', column_type: `enum('enum1')`, data_type: 'enum' },
-          { column_name: 'column1', column_type: `enum('enum2')`, data_type: 'enum' },
-        ])
-      );
+      db.mysqlStub.withResults([
+        { column_name: 'column1', column_type: `enum('enum1')`, data_type: 'enum' },
+        { column_name: 'column1', column_type: `enum('enum2')`, data_type: 'enum' },
+      ]);
+
       try {
-        await db.getEnumTypes('testschema');
+        await mysqlProxy.getEnumTypes('testschema');
       } catch (e) {
-        assert.strictEqual(
-          e.message,
+        expect(e.message).toEqual(
           'Multiple enums with the same name and contradicting types were found: column1: ["enum1"] and ["enum2"]'
         );
       }
     });
   });
+
   describe('getTableDefinitions', () => {
     it('writes correct query', async () => {
-      MysqlDBReflection.prototype.queryAsync.returns(Promise.resolve([]));
-      await db.getTableDefinition('testtable', 'testschema');
-      assert.deepStrictEqual(MysqlDBReflection.prototype.queryAsync.getCall(0).args, [
+      db.mysqlStub.withResults([]);
+
+      await mysqlProxy.getTableDefinition('testtable', 'testschema');
+      expect(db.mysqlStub.query).toHaveBeenCalledWith(
         'SELECT column_name, data_type, is_nullable ' +
           'FROM information_schema.columns ' +
           'WHERE table_name = ? and table_schema = ?',
         ['testtable', 'testschema'],
-      ]);
-    });
-    it('handles response', async () => {
-      MysqlDBReflection.prototype.queryAsync.returns(
-        Promise.resolve([
-          { column_name: 'column1', data_type: 'data1', is_nullable: 'NO' },
-          { column_name: 'column2', data_type: 'enum', is_nullable: 'YES' },
-          { column_name: 'column3', data_type: 'set', is_nullable: 'YES' },
-        ])
+        expect.any(Function)
       );
-      const schemaTables = await db.getTableDefinition('testtable', 'testschema');
-      assert.deepStrictEqual(schemaTables, {
+    });
+
+    it('handles response', async () => {
+      db.mysqlStub.withResults([
+        { column_name: 'column1', data_type: 'data1', is_nullable: 'NO' },
+        { column_name: 'column2', data_type: 'enum', is_nullable: 'YES' },
+        { column_name: 'column3', data_type: 'set', is_nullable: 'YES' },
+      ]);
+
+      const schemaTables = await mysqlProxy.getTableDefinition('testtable', 'testschema');
+      expect(schemaTables).toEqual({
         column1: { udtName: 'data1', nullable: false },
         column2: { udtName: 'enum_column2', nullable: true },
         column3: { udtName: 'set_column3', nullable: true },
       });
     });
   });
+
   describe('getTableTypes', () => {
-    beforeAll(() => {
+    beforeEach(() => {
       spies = {
-        getEnumTypes: jest.spyOn(MysqlDBReflection.prototype, 'getEnumTypes'),
-        getTableDefinition: jest.spyOn(MysqlDBReflection.prototype, 'getTableDefinition'),
+        getEnumTypes: jest.spyOn(MysqlDatabase.prototype, 'getEnumTypes'),
+        getTableDefinition: jest.spyOn(MysqlDatabase.prototype, 'getTableDefinition'),
         mapTableDefinitionToType: jest.spyOn(MysqlDBReflection, 'mapTableDefinitionToType'),
       };
     });
 
-    beforeEach(() => {
-      Object.keys(spies).forEach(key => spies[key].mockClear());
+    afterEach(() => {
+      Object.values(spies).forEach((fn: any) => fn.mockRestore());
     });
 
     it('gets custom types from enums', async () => {
-      MysqlDBReflection.prototype.getEnumTypes.returns(Promise.resolve({ enum1: [], enum2: [] }));
-      MysqlDBReflection.prototype.getTableDefinition.returns(Promise.resolve({}));
-      await db.getTableTypes('tableName', 'tableSchema', options);
-      assert.deepStrictEqual(MysqlDBReflection.mapTableDefinitionToType.getCall(0).args[1], [
-        'enum1',
-        'enum2',
-      ]);
+      (MysqlDatabase as any).prototype.getEnumTypes.mockReturnValue(
+        Promise.resolve({
+          enum1: [],
+          enum2: [],
+        })
+      );
+      (MysqlDatabase as any).prototype.getTableDefinition.mockReturnValue(Promise.resolve({}));
+
+      await mysqlProxy.getTableTypes('tableName', 'tableSchema', options);
+      expect(MysqlDBReflection.mapTableDefinitionToType).toHaveBeenCalledWith(
+        {},
+        ['enum1', 'enum2'],
+        expect.any(Object)
+      );
     });
+
     it('gets table definitions', async () => {
-      MysqlDBReflection.prototype.getEnumTypes.returns(Promise.resolve({}));
-      MysqlDBReflection.prototype.getTableDefinition.returns(
+      (MysqlDatabase as any).prototype.getEnumTypes.mockReturnValue(Promise.resolve({}));
+      (MysqlDatabase as any).prototype.getTableDefinition.mockReturnValue(
         Promise.resolve({
           table: {
             udtName: 'name',
@@ -219,284 +207,103 @@ describe('MysqlDatabase', () => {
           },
         })
       );
-      await db.getTableTypes('tableName', 'tableSchema', options);
-      assert.deepStrictEqual(MysqlDBReflection.prototype.getTableDefinition.getCall(0).args, [
+      await mysqlProxy.getTableTypes('tableName', 'tableSchema', options);
+      expect(MysqlDBReflection.prototype.getTableDefinition).toHaveBeenCalledWith(
         'tableName',
-        'tableSchema',
-      ]);
-      assert.deepStrictEqual(MysqlDBReflection.mapTableDefinitionToType.getCall(0).args[0], {
-        table: {
-          udtName: 'name',
-          nullable: false,
+        'tableSchema'
+      );
+      expect(MysqlDBReflection.mapTableDefinitionToType).toHaveBeenCalledWith(
+        {
+          table: {
+            udtName: 'name',
+            nullable: false,
+            tsType: 'any',
+          },
         },
-      });
+        [],
+        expect.any(Object)
+      );
     });
   });
+
   describe('getSchemaTables', () => {
     it('writes correct query', async () => {
-      MysqlDBReflection.prototype.queryAsync.returns(Promise.resolve([]));
-      await db.getSchemaTables('testschema');
-      assert.deepStrictEqual(MysqlDBReflection.prototype.queryAsync.getCall(0).args, [
+      db.mysqlStub.withResults([]);
+
+      await mysqlProxy.getSchemaTables('testschema');
+      expect(db.mysqlStub.query).toHaveBeenCalledWith(
         'SELECT table_name ' +
           'FROM information_schema.columns ' +
           'WHERE table_schema = ? ' +
           'GROUP BY table_name',
         ['testschema'],
-      ]);
-    });
-    it('handles table response', async () => {
-      MysqlDBReflection.prototype.queryAsync.returns(
-        Promise.resolve([{ table_name: 'table1' }, { table_name: 'table2' }])
+        expect.any(Function)
       );
-      const schemaTables = await db.getSchemaTables('testschema');
-      assert.deepStrictEqual(schemaTables, ['table1', 'table2']);
+    });
+
+    it('handles table response', async () => {
+      db.mysqlStub.withResults([{ table_name: 'table1' }, { table_name: 'table2' }]);
+
+      const schemaTables = await mysqlProxy.getSchemaTables('testschema');
+      expect(schemaTables).toEqual(['table1', 'table2']);
     });
   });
+
   describe('mapTableDefinitionToType', () => {
     describe('maps to string', () => {
-      it('char', () => {
-        const td: TableDefinition = {
-          column: {
-            udtName: 'char',
-            nullable: false,
-          },
-        };
-        assert.strictEqual(
-          MysqlDBReflection.mapTableDefinitionToType(td, [], options).column.tsType,
-          'string'
-        );
-      });
-      it('varchar', () => {
-        const td: TableDefinition = {
-          column: {
-            udtName: 'varchar',
-            nullable: false,
-          },
-        };
-        assert.strictEqual(
-          MysqlDBReflection.mapTableDefinitionToType(td, [], options).column.tsType,
-          'string'
-        );
-      });
-      it('text', () => {
-        const td: TableDefinition = {
-          column: {
-            udtName: 'text',
-            nullable: false,
-          },
-        };
-        assert.strictEqual(
-          MysqlDBReflection.mapTableDefinitionToType(td, [], options).column.tsType,
-          'string'
-        );
-      });
-      it('tinytext', () => {
-        const td: TableDefinition = {
-          column: {
-            udtName: 'tinytext',
-            nullable: false,
-          },
-        };
-        assert.strictEqual(
-          MysqlDBReflection.mapTableDefinitionToType(td, [], options).column.tsType,
-          'string'
-        );
-      });
-      it('mediumtext', () => {
-        const td: TableDefinition = {
-          column: {
-            udtName: 'mediumtext',
-            nullable: false,
-          },
-        };
-        assert.strictEqual(
-          MysqlDBReflection.mapTableDefinitionToType(td, [], options).column.tsType,
-          'string'
-        );
-      });
-      it('longtext', () => {
-        const td: TableDefinition = {
-          column: {
-            udtName: 'longtext',
-            nullable: false,
-          },
-        };
-        assert.strictEqual(
-          MysqlDBReflection.mapTableDefinitionToType(td, [], options).column.tsType,
-          'string'
-        );
-      });
-      it('time', () => {
-        const td: TableDefinition = {
-          column: {
-            udtName: 'time',
-            nullable: false,
-          },
-        };
-        assert.strictEqual(
-          MysqlDBReflection.mapTableDefinitionToType(td, [], options).column.tsType,
-          'string'
-        );
-      });
-      it('geometry', () => {
-        const td: TableDefinition = {
-          column: {
-            udtName: 'geometry',
-            nullable: false,
-          },
-        };
-        assert.strictEqual(
-          MysqlDBReflection.mapTableDefinitionToType(td, [], options).column.tsType,
-          'string'
-        );
-      });
-      it('set', () => {
-        const td: TableDefinition = {
-          column: {
-            udtName: 'set',
-            nullable: false,
-          },
-        };
-        assert.strictEqual(
-          MysqlDBReflection.mapTableDefinitionToType(td, [], options).column.tsType,
-          'string'
-        );
-      });
-      it('enum', () => {
-        const td: TableDefinition = {
-          column: {
-            udtName: 'enum',
-            nullable: false,
-          },
-        };
-        assert.strictEqual(
-          MysqlDBReflection.mapTableDefinitionToType(td, [], options).column.tsType,
-          'string'
-        );
-      });
+      [
+        'char',
+        'varchar',
+        'text',
+        'tinytext',
+        'mediumtext',
+        'longtext',
+        'time',
+        'geometry',
+        'set',
+        'enum',
+      ].forEach(type =>
+        it(type, () => {
+          const td: TableDefinition = {
+            column: {
+              udtName: type,
+              nullable: false,
+            },
+          };
+          expect(MysqlDBReflection.mapTableDefinitionToType(td, [], options).column.tsType).toEqual(
+            'string'
+          );
+        })
+      );
     });
+
     describe('maps to number', () => {
-      it('integer', () => {
-        const td: TableDefinition = {
-          column: {
-            udtName: 'integer',
-            nullable: false,
-          },
-        };
-        assert.strictEqual(
-          MysqlDBReflection.mapTableDefinitionToType(td, [], options).column.tsType,
-          'number'
-        );
-      });
-      it('int', () => {
-        const td: TableDefinition = {
-          column: {
-            udtName: 'int',
-            nullable: false,
-          },
-        };
-        assert.strictEqual(
-          MysqlDBReflection.mapTableDefinitionToType(td, [], options).column.tsType,
-          'number'
-        );
-      });
-      it('smallint', () => {
-        const td: TableDefinition = {
-          column: {
-            udtName: 'smallint',
-            nullable: false,
-          },
-        };
-        assert.strictEqual(
-          MysqlDBReflection.mapTableDefinitionToType(td, [], options).column.tsType,
-          'number'
-        );
-      });
-      it('mediumint', () => {
-        const td: TableDefinition = {
-          column: {
-            udtName: 'mediumint',
-            nullable: false,
-          },
-        };
-        assert.strictEqual(
-          MysqlDBReflection.mapTableDefinitionToType(td, [], options).column.tsType,
-          'number'
-        );
-      });
-      it('bigint', () => {
-        const td: TableDefinition = {
-          column: {
-            udtName: 'bigint',
-            nullable: false,
-          },
-        };
-        assert.strictEqual(
-          MysqlDBReflection.mapTableDefinitionToType(td, [], options).column.tsType,
-          'number'
-        );
-      });
-      it('double', () => {
-        const td: TableDefinition = {
-          column: {
-            udtName: 'double',
-            nullable: false,
-          },
-        };
-        assert.strictEqual(
-          MysqlDBReflection.mapTableDefinitionToType(td, [], options).column.tsType,
-          'number'
-        );
-      });
-      it('decimal', () => {
-        const td: TableDefinition = {
-          column: {
-            udtName: 'decimal',
-            nullable: false,
-          },
-        };
-        assert.strictEqual(
-          MysqlDBReflection.mapTableDefinitionToType(td, [], options).column.tsType,
-          'number'
-        );
-      });
-      it('numeric', () => {
-        const td: TableDefinition = {
-          column: {
-            udtName: 'numeric',
-            nullable: false,
-          },
-        };
-        assert.strictEqual(
-          MysqlDBReflection.mapTableDefinitionToType(td, [], options).column.tsType,
-          'number'
-        );
-      });
-      it('float', () => {
-        const td: TableDefinition = {
-          column: {
-            udtName: 'float',
-            nullable: false,
-          },
-        };
-        assert.strictEqual(
-          MysqlDBReflection.mapTableDefinitionToType(td, [], options).column.tsType,
-          'number'
-        );
-      });
-      it('year', () => {
-        const td: TableDefinition = {
-          column: {
-            udtName: 'year',
-            nullable: false,
-          },
-        };
-        assert.strictEqual(
-          MysqlDBReflection.mapTableDefinitionToType(td, [], options).column.tsType,
-          'number'
-        );
-      });
+      [
+        'integer',
+        'int',
+        'smallint',
+        'mediumint',
+        'bigint',
+        'double',
+        'decimal',
+        'numeric',
+        'float',
+        'year',
+      ].forEach(type =>
+        it(type, () => {
+          const td: TableDefinition = {
+            column: {
+              udtName: type,
+              nullable: false,
+            },
+          };
+          expect(MysqlDBReflection.mapTableDefinitionToType(td, [], options).column.tsType).toEqual(
+            'number'
+          );
+        })
+      );
     });
+
     describe('maps to boolean', () => {
       it('tinyint', () => {
         const td: TableDefinition = {
@@ -505,12 +312,12 @@ describe('MysqlDatabase', () => {
             nullable: false,
           },
         };
-        assert.strictEqual(
-          MysqlDBReflection.mapTableDefinitionToType(td, [], options).column.tsType,
+        expect(MysqlDBReflection.mapTableDefinitionToType(td, [], options).column.tsType).toEqual(
           'boolean'
         );
       });
     });
+
     describe('maps to Object', () => {
       it('json', () => {
         const td: TableDefinition = {
@@ -519,136 +326,44 @@ describe('MysqlDatabase', () => {
             nullable: false,
           },
         };
-        assert.strictEqual(
-          MysqlDBReflection.mapTableDefinitionToType(td, [], options).column.tsType,
+        expect(MysqlDBReflection.mapTableDefinitionToType(td, [], options).column.tsType).toEqual(
           'Object'
         );
       });
     });
+
     describe('maps to Date', () => {
-      it('date', () => {
-        const td: TableDefinition = {
-          column: {
-            udtName: 'date',
-            nullable: false,
-          },
-        };
-        assert.strictEqual(
-          MysqlDBReflection.mapTableDefinitionToType(td, [], options).column.tsType,
-          'Date'
-        );
-      });
-      it('datetime', () => {
-        const td: TableDefinition = {
-          column: {
-            udtName: 'datetime',
-            nullable: false,
-          },
-        };
-        assert.strictEqual(
-          MysqlDBReflection.mapTableDefinitionToType(td, [], options).column.tsType,
-          'Date'
-        );
-      });
-      it('timestamp', () => {
-        const td: TableDefinition = {
-          column: {
-            udtName: 'timestamp',
-            nullable: false,
-          },
-        };
-        assert.strictEqual(
-          MysqlDBReflection.mapTableDefinitionToType(td, [], options).column.tsType,
-          'Date'
-        );
-      });
+      ['date', 'datetime', 'timestamp'].forEach(type =>
+        it(type, () => {
+          const td: TableDefinition = {
+            column: {
+              udtName: type,
+              nullable: false,
+            },
+          };
+          expect(MysqlDBReflection.mapTableDefinitionToType(td, [], options).column.tsType).toEqual(
+            'Date'
+          );
+        })
+      );
     });
+
     describe('maps to Buffer', () => {
-      it('tinyblob', () => {
-        const td: TableDefinition = {
-          column: {
-            udtName: 'tinyblob',
-            nullable: false,
-          },
-        };
-        assert.strictEqual(
-          MysqlDBReflection.mapTableDefinitionToType(td, [], options).column.tsType,
-          'Buffer'
-        );
-      });
-      it('mediumblob', () => {
-        const td: TableDefinition = {
-          column: {
-            udtName: 'mediumblob',
-            nullable: false,
-          },
-        };
-        assert.strictEqual(
-          MysqlDBReflection.mapTableDefinitionToType(td, [], options).column.tsType,
-          'Buffer'
-        );
-      });
-      it('longblob', () => {
-        const td: TableDefinition = {
-          column: {
-            udtName: 'longblob',
-            nullable: false,
-          },
-        };
-        assert.strictEqual(
-          MysqlDBReflection.mapTableDefinitionToType(td, [], options).column.tsType,
-          'Buffer'
-        );
-      });
-      it('blob', () => {
-        const td: TableDefinition = {
-          column: {
-            udtName: 'blob',
-            nullable: false,
-          },
-        };
-        assert.strictEqual(
-          MysqlDBReflection.mapTableDefinitionToType(td, [], options).column.tsType,
-          'Buffer'
-        );
-      });
-      it('binary', () => {
-        const td: TableDefinition = {
-          column: {
-            udtName: 'binary',
-            nullable: false,
-          },
-        };
-        assert.strictEqual(
-          MysqlDBReflection.mapTableDefinitionToType(td, [], options).column.tsType,
-          'Buffer'
-        );
-      });
-      it('varbinary', () => {
-        const td: TableDefinition = {
-          column: {
-            udtName: 'varbinary',
-            nullable: false,
-          },
-        };
-        assert.strictEqual(
-          MysqlDBReflection.mapTableDefinitionToType(td, [], options).column.tsType,
-          'Buffer'
-        );
-      });
-      it('bit', () => {
-        const td: TableDefinition = {
-          column: {
-            udtName: 'bit',
-            nullable: false,
-          },
-        };
-        assert.strictEqual(
-          MysqlDBReflection.mapTableDefinitionToType(td, [], options).column.tsType,
-          'Buffer'
-        );
-      });
+      ['tinyblob', 'mediumblob', 'longblob', 'blob', 'binary', 'varbinary', 'bit'].forEach(type =>
+        it(type, () => {
+          const td: TableDefinition = {
+            column: {
+              udtName: type,
+              nullable: false,
+            },
+          };
+          expect(MysqlDBReflection.mapTableDefinitionToType(td, [], options).column.tsType).toEqual(
+            'Buffer'
+          );
+        })
+      );
     });
+
     describe('maps to custom', () => {
       it('CustomType', () => {
         const td: TableDefinition = {
@@ -657,12 +372,12 @@ describe('MysqlDatabase', () => {
             nullable: false,
           },
         };
-        assert.strictEqual(
-          MysqlDBReflection.mapTableDefinitionToType(td, ['CustomType'], options).column.tsType,
-          'CustomType'
-        );
+        expect(
+          MysqlDBReflection.mapTableDefinitionToType(td, ['CustomType'], options).column.tsType
+        ).toEqual('CustomType');
       });
     });
+
     describe('maps to any', () => {
       it('UnknownType', () => {
         const td: TableDefinition = {
@@ -671,10 +386,9 @@ describe('MysqlDatabase', () => {
             nullable: false,
           },
         };
-        assert.strictEqual(
-          MysqlDBReflection.mapTableDefinitionToType(td, ['CustomType'], options).column.tsType,
-          'any'
-        );
+        expect(
+          MysqlDBReflection.mapTableDefinitionToType(td, ['CustomType'], options).column.tsType
+        ).toEqual('any');
       });
     });
   });
