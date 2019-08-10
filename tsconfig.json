@@ -3,15 +3,13 @@
     "module": "commonjs",
     "target": "es2016",
     "outDir": "dist",
-    "lib": [
-      "es2015",
-      "es2017"
-    ],
+    "lib": ["es2015", "es2017"],
     "noImplicitAny": true,
     "declaration": true,
     "strictNullChecks": true,
     "newLine": "LF",
-    "sourceMap": true
+    "sourceMap": true,
+    "moduleResolution": "node"
   },
   "exclude": [
     "node_modules",
@@ -21,9 +19,5 @@
     "__tests__/fixture",
     "**/*.d.ts"
   ],
-  "include": [
-    "src/**/*.ts",
-    "__tests__/**/*.test.ts",
-    "bin/**/*.ts"
-  ]
+  "include": ["src/**/*.ts", "__tests__/**/*.test.ts", "bin/**/*.ts"]
 }

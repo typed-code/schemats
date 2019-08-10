@@ -1,0 +1,277 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`schema generation integration testing postgres Basic generation 1`] = `
+"/* tslint:disable */
+
+export type format_enum = 'html' | 'markdown' | 'text';
+export type user_status_enum = 'active' | 'confirmed' | 'deleted' | 'pending' | 'suspended';
+
+export namespace usersFields {
+  export type email = string;
+  export type id = number;
+  export type pass_crypt = string;
+  export type creation_time = Date;
+  export type display_name = string;
+  export type data_public = boolean;
+  export type description = string;
+  export type home_lat = number | null;
+  export type home_lon = number | null;
+  export type home_zoom = number | null;
+  export type nearby = number | null;
+  export type pass_salt = string | null;
+  export type image_file_name = string | null;
+  export type email_valid = boolean;
+  export type new_email = string | null;
+  export type creation_ip = string | null;
+  export type languages = string | null;
+  export type status = user_status_enum;
+  export type terms_agreed = Date | null;
+  export type consider_pd = boolean;
+  export type preferred_editor = string | null;
+  export type terms_seen = boolean;
+  export type auth_uid = string | null;
+  export type description_format = format_enum;
+  export type image_fingerprint = string | null;
+  export type changesets_count = number;
+  export type traces_count = number;
+  export type diary_entries_count = number;
+  export type image_use_gravatar = boolean;
+  export type image_content_type = string | null;
+  export type auth_provider = string | null;
+  export type uuid_column = string | null;
+  export type number_ = number | null;
+  export type string_ = string | null;
+  export type money_col = number | null;
+  export type char_col = string | null;
+  export type time_col = string | null;
+  export type inet_col = string | null;
+  export type jsonb_col = Object | null;
+  export type numeric_col = number | null;
+  export type bytea_col = string | null;
+  export type bool_array_col = Array<boolean> | null;
+  export type varchar_array_col = Array<string> | null;
+  export type int2_array_col = Array<number> | null;
+  export type int4_array_col = Array<number> | null;
+  export type int8_array_col = Array<number> | null;
+  export type uuid_array_col = Array<string> | null;
+  export type text_array_col = Array<string> | null;
+  export type bytea_array_col = Array<string> | null;
+  export type real_col = number | null;
+  export type double_col = number | null;
+  export type time_with_tz = string | null;
+  export type oid_col = number | null;
+  export type interval_col = string | null;
+  export type json_col = Object | null;
+  export type date_col = Date | null;
+  export type unspported_path_type = any | null;
+  export type name_type_col = string | null;
+  export type json_array_col = Array<Object> | null;
+  export type jsonb_array_col = Array<Object> | null;
+  export type timestamptz_array_col = Array<Date> | null;
+
+}
+
+export interface users {
+  email: usersFields.email;
+  id: usersFields.id;
+  pass_crypt: usersFields.pass_crypt;
+  creation_time: usersFields.creation_time;
+  display_name: usersFields.display_name;
+  data_public: usersFields.data_public;
+  description: usersFields.description;
+  home_lat: usersFields.home_lat;
+  home_lon: usersFields.home_lon;
+  home_zoom: usersFields.home_zoom;
+  nearby: usersFields.nearby;
+  pass_salt: usersFields.pass_salt;
+  image_file_name: usersFields.image_file_name;
+  email_valid: usersFields.email_valid;
+  new_email: usersFields.new_email;
+  creation_ip: usersFields.creation_ip;
+  languages: usersFields.languages;
+  status: usersFields.status;
+  terms_agreed: usersFields.terms_agreed;
+  consider_pd: usersFields.consider_pd;
+  preferred_editor: usersFields.preferred_editor;
+  terms_seen: usersFields.terms_seen;
+  auth_uid: usersFields.auth_uid;
+  description_format: usersFields.description_format;
+  image_fingerprint: usersFields.image_fingerprint;
+  changesets_count: usersFields.changesets_count;
+  traces_count: usersFields.traces_count;
+  diary_entries_count: usersFields.diary_entries_count;
+  image_use_gravatar: usersFields.image_use_gravatar;
+  image_content_type: usersFields.image_content_type;
+  auth_provider: usersFields.auth_provider;
+  uuid_column: usersFields.uuid_column;
+  number: usersFields.number_;
+  string: usersFields.string_;
+  money_col: usersFields.money_col;
+  char_col: usersFields.char_col;
+  time_col: usersFields.time_col;
+  inet_col: usersFields.inet_col;
+  jsonb_col: usersFields.jsonb_col;
+  numeric_col: usersFields.numeric_col;
+  bytea_col: usersFields.bytea_col;
+  bool_array_col: usersFields.bool_array_col;
+  varchar_array_col: usersFields.varchar_array_col;
+  int2_array_col: usersFields.int2_array_col;
+  int4_array_col: usersFields.int4_array_col;
+  int8_array_col: usersFields.int8_array_col;
+  uuid_array_col: usersFields.uuid_array_col;
+  text_array_col: usersFields.text_array_col;
+  bytea_array_col: usersFields.bytea_array_col;
+  real_col: usersFields.real_col;
+  double_col: usersFields.double_col;
+  time_with_tz: usersFields.time_with_tz;
+  oid_col: usersFields.oid_col;
+  interval_col: usersFields.interval_col;
+  json_col: usersFields.json_col;
+  date_col: usersFields.date_col;
+  unspported_path_type: usersFields.unspported_path_type;
+  name_type_col: usersFields.name_type_col;
+  json_array_col: usersFields.json_array_col;
+  jsonb_array_col: usersFields.jsonb_array_col;
+  timestamptz_array_col: usersFields.timestamptz_array_col;
+
+}
+"
+`;
+
+exports[`schema generation integration testing postgres Camelcase generation 1`] = `
+"/* tslint:disable */
+
+export type FormatEnum = 'html' | 'markdown' | 'text';
+export type UserStatusEnum = 'active' | 'confirmed' | 'deleted' | 'pending' | 'suspended';
+
+export namespace UsersFields {
+  export type email = string;
+  export type id = number;
+  export type passCrypt = string;
+  export type creationTime = Date;
+  export type displayName = string;
+  export type dataPublic = boolean;
+  export type description = string;
+  export type homeLat = number | null;
+  export type homeLon = number | null;
+  export type homeZoom = number | null;
+  export type nearby = number | null;
+  export type passSalt = string | null;
+  export type imageFileName = string | null;
+  export type emailValid = boolean;
+  export type newEmail = string | null;
+  export type creationIp = string | null;
+  export type languages = string | null;
+  export type status = UserStatusEnum;
+  export type termsAgreed = Date | null;
+  export type considerPd = boolean;
+  export type preferredEditor = string | null;
+  export type termsSeen = boolean;
+  export type authUid = string | null;
+  export type descriptionFormat = FormatEnum;
+  export type imageFingerprint = string | null;
+  export type changesetsCount = number;
+  export type tracesCount = number;
+  export type diaryEntriesCount = number;
+  export type imageUseGravatar = boolean;
+  export type imageContentType = string | null;
+  export type authProvider = string | null;
+  export type uuidColumn = string | null;
+  export type number_ = number | null;
+  export type string_ = string | null;
+  export type moneyCol = number | null;
+  export type charCol = string | null;
+  export type timeCol = string | null;
+  export type inetCol = string | null;
+  export type jsonbCol = Object | null;
+  export type numericCol = number | null;
+  export type byteaCol = string | null;
+  export type boolArrayCol = Array<boolean> | null;
+  export type varcharArrayCol = Array<string> | null;
+  export type int2ArrayCol = Array<number> | null;
+  export type int4ArrayCol = Array<number> | null;
+  export type int8ArrayCol = Array<number> | null;
+  export type uuidArrayCol = Array<string> | null;
+  export type textArrayCol = Array<string> | null;
+  export type byteaArrayCol = Array<string> | null;
+  export type realCol = number | null;
+  export type doubleCol = number | null;
+  export type timeWithTz = string | null;
+  export type oidCol = number | null;
+  export type intervalCol = string | null;
+  export type jsonCol = Object | null;
+  export type dateCol = Date | null;
+  export type unspportedPathType = any | null;
+  export type nameTypeCol = string | null;
+  export type jsonArrayCol = Array<Object> | null;
+  export type jsonbArrayCol = Array<Object> | null;
+  export type timestamptzArrayCol = Array<Date> | null;
+
+}
+
+export interface Users {
+  email: UsersFields.email;
+  id: UsersFields.id;
+  passCrypt: UsersFields.passCrypt;
+  creationTime: UsersFields.creationTime;
+  displayName: UsersFields.displayName;
+  dataPublic: UsersFields.dataPublic;
+  description: UsersFields.description;
+  homeLat: UsersFields.homeLat;
+  homeLon: UsersFields.homeLon;
+  homeZoom: UsersFields.homeZoom;
+  nearby: UsersFields.nearby;
+  passSalt: UsersFields.passSalt;
+  imageFileName: UsersFields.imageFileName;
+  emailValid: UsersFields.emailValid;
+  newEmail: UsersFields.newEmail;
+  creationIp: UsersFields.creationIp;
+  languages: UsersFields.languages;
+  status: UsersFields.status;
+  termsAgreed: UsersFields.termsAgreed;
+  considerPd: UsersFields.considerPd;
+  preferredEditor: UsersFields.preferredEditor;
+  termsSeen: UsersFields.termsSeen;
+  authUid: UsersFields.authUid;
+  descriptionFormat: UsersFields.descriptionFormat;
+  imageFingerprint: UsersFields.imageFingerprint;
+  changesetsCount: UsersFields.changesetsCount;
+  tracesCount: UsersFields.tracesCount;
+  diaryEntriesCount: UsersFields.diaryEntriesCount;
+  imageUseGravatar: UsersFields.imageUseGravatar;
+  imageContentType: UsersFields.imageContentType;
+  authProvider: UsersFields.authProvider;
+  uuidColumn: UsersFields.uuidColumn;
+  number: UsersFields.number_;
+  string: UsersFields.string_;
+  moneyCol: UsersFields.moneyCol;
+  charCol: UsersFields.charCol;
+  timeCol: UsersFields.timeCol;
+  inetCol: UsersFields.inetCol;
+  jsonbCol: UsersFields.jsonbCol;
+  numericCol: UsersFields.numericCol;
+  byteaCol: UsersFields.byteaCol;
+  boolArrayCol: UsersFields.boolArrayCol;
+  varcharArrayCol: UsersFields.varcharArrayCol;
+  int2ArrayCol: UsersFields.int2ArrayCol;
+  int4ArrayCol: UsersFields.int4ArrayCol;
+  int8ArrayCol: UsersFields.int8ArrayCol;
+  uuidArrayCol: UsersFields.uuidArrayCol;
+  textArrayCol: UsersFields.textArrayCol;
+  byteaArrayCol: UsersFields.byteaArrayCol;
+  realCol: UsersFields.realCol;
+  doubleCol: UsersFields.doubleCol;
+  timeWithTz: UsersFields.timeWithTz;
+  oidCol: UsersFields.oidCol;
+  intervalCol: UsersFields.intervalCol;
+  jsonCol: UsersFields.jsonCol;
+  dateCol: UsersFields.dateCol;
+  unspportedPathType: UsersFields.unspportedPathType;
+  nameTypeCol: UsersFields.nameTypeCol;
+  jsonArrayCol: UsersFields.jsonArrayCol;
+  jsonbArrayCol: UsersFields.jsonbArrayCol;
+  timestamptzArrayCol: UsersFields.timestamptzArrayCol;
+
+}
+"
+`;

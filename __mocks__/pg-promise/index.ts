@@ -7,7 +7,9 @@ const pgpStub = {
   map: jest.fn(),
 };
 
-export = function pgpStubFactory(shouldReturnMockHandler = false) {
+let isStubEnabled = true;
+
+function pgpStubFactory(shouldReturnMockHandler = false) {
   if (shouldReturnMockHandler) {
     return {
       pgpStub,
@@ -18,7 +20,13 @@ export = function pgpStubFactory(shouldReturnMockHandler = false) {
       },
     };
   }
-  const dbConnection = () => pgpStub;
+  const dbConnection = (conn: string) => isStubEnabled ? pgpStub : pgp(conn);
+
   dbConnection.as = pgp.as;
   return dbConnection;
-};
+}
+
+pgpStubFactory.disableStub = () => (isStubEnabled = false);
+pgpStubFactory.enableStub = () => (isStubEnabled = true);
+
+export = pgpStubFactory;

@@ -3,12 +3,14 @@
  * Created by xiamx on 2016-08-10.
  */
 
+import * as pkgUp from 'pkg-up';
 import { Options as ITFOptions, processString } from 'typescript-formatter';
 import Options, { OptionValues } from './options';
 import { Database, getDatabase } from './schema';
 import { generateEnumType, generateTableInterface, generateTableTypes } from './typescript';
 
-const pkgVersion = require('../package.json').version;
+const pkgPath = pkgUp.sync();
+const pkgVersion = pkgPath ? require(pkgPath).version : 'UNKNOWN';
 
 function getTime() {
   const padTime = (value: number) => `0${value}`.slice(-2);

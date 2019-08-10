@@ -2,9 +2,9 @@ import { spawnSync } from 'child_process';
 import { condDescribe } from '../testUtility';
 
 describe('schemats cli tool integration testing', () => {
-  condDescribe(!!process.env.POSTGRES_URL, 'schemats generate postgres', () => {
+  condDescribe(!!process.env.POSTGRES_URL, this, 'schemats generate postgres', () => {
     it('should run without error', () => {
-      const { status, stdout, stderr } = spawnSync(
+      const { status } = spawnSync(
         'node',
         [
           'dist/bin/schemats',
@@ -17,13 +17,19 @@ describe('schemats cli tool integration testing', () => {
         { encoding: 'utf-8' }
       );
 
-      // tslint:disable-next-line
-      console.log('opopopopop', stdout, stderr);
+      console.log([
+        'dist/bin/schemats',
+        'generate',
+        '-c',
+        process.env.POSTGRES_URL as string,
+        '-o',
+        '/tmp/schemats_cli_postgres.ts',
+      ].join(' '));
       expect(status).toBe(0);
     });
   });
 
-  condDescribe(!!process.env.MYSQL_URL, 'schemats generate mysql', () => {
+  condDescribe(!!process.env.MYSQL_URL, this, 'schemats generate mysql', () => {
     it('should run without error', () => {
       const { status } = spawnSync('node', [
         'dist/bin/schemats',

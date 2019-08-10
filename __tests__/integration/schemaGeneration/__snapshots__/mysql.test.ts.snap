@@ -1,0 +1,329 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`schema generation integration testing mysql Basic generation 1`] = `
+"/* tslint:disable */
+
+export type enum_enum_col = 'enum1' | 'enum2' | 'enum3';
+export type enum_nullable_enum_col = 'enum1' | 'enum2' | 'enum3';
+export type set_nullable_set_col = 'set1' | 'set2' | 'set3';
+export type set_set_col = 'set1' | 'set2' | 'set3';
+
+export namespace usersFields {
+  export type bigint_col = number;
+  export type binary_col = Buffer;
+  export type bit_col = Buffer;
+  export type blob_col = Buffer;
+  export type char_col = string;
+  export type date_col = Date;
+  export type datetime_col = Date;
+  export type decimal_col = number;
+  export type double_col = number;
+  export type enum_col = enum_enum_col;
+  export type float_col = number;
+  export type geometry_col = string;
+  export type int_col = number;
+  export type integer_col = number;
+  export type longblob_col = Buffer;
+  export type longtext_col = string;
+  export type mediumblob_col = Buffer;
+  export type mediumint_col = number;
+  export type mediumtext_col = string;
+  export type nullable_bigint_col = number | null;
+  export type nullable_binary_col = Buffer | null;
+  export type nullable_bit_col = Buffer | null;
+  export type nullable_blob_col = Buffer | null;
+  export type nullable_char_col = string | null;
+  export type nullable_date_col = Date | null;
+  export type nullable_datetime_col = Date | null;
+  export type nullable_decimal_col = number | null;
+  export type nullable_double_col = number | null;
+  export type nullable_enum_col = enum_nullable_enum_col | null;
+  export type nullable_float_col = number | null;
+  export type nullable_geometry_col = string | null;
+  export type nullable_int_col = number | null;
+  export type nullable_integer_col = number | null;
+  export type nullable_longblob_col = Buffer | null;
+  export type nullable_longtext_col = string | null;
+  export type nullable_mediumblob_col = Buffer | null;
+  export type nullable_mediumint_col = number | null;
+  export type nullable_mediumtext_col = string | null;
+  export type nullable_numeric_col = number | null;
+  export type nullable_set_col = set_nullable_set_col | null;
+  export type nullable_smallint_col = number | null;
+  export type nullable_text_col = string | null;
+  export type nullable_time_col = string | null;
+  export type nullable_tinyblob_col = Buffer | null;
+  export type nullable_tinyint_col = boolean | null;
+  export type nullable_tinytext_col = string | null;
+  export type nullable_varbinary_col = Buffer | null;
+  export type nullable_year_col = number | null;
+  export type numeric_col = number;
+  export type set_col = set_set_col;
+  export type smallint_col = number;
+  export type text_col = string;
+  export type time_col = string;
+  export type timestamp_col = Date;
+  export type tinyblob_col = Buffer;
+  export type tinyint_col = boolean;
+  export type tinytext_col = string;
+  export type varbinary_col = Buffer;
+  export type year_col = number;
+
+}
+
+export interface users {
+  bigint_col: usersFields.bigint_col;
+  binary_col: usersFields.binary_col;
+  bit_col: usersFields.bit_col;
+  blob_col: usersFields.blob_col;
+  char_col: usersFields.char_col;
+  date_col: usersFields.date_col;
+  datetime_col: usersFields.datetime_col;
+  decimal_col: usersFields.decimal_col;
+  double_col: usersFields.double_col;
+  enum_col: usersFields.enum_col;
+  float_col: usersFields.float_col;
+  geometry_col: usersFields.geometry_col;
+  int_col: usersFields.int_col;
+  integer_col: usersFields.integer_col;
+  longblob_col: usersFields.longblob_col;
+  longtext_col: usersFields.longtext_col;
+  mediumblob_col: usersFields.mediumblob_col;
+  mediumint_col: usersFields.mediumint_col;
+  mediumtext_col: usersFields.mediumtext_col;
+  nullable_bigint_col: usersFields.nullable_bigint_col;
+  nullable_binary_col: usersFields.nullable_binary_col;
+  nullable_bit_col: usersFields.nullable_bit_col;
+  nullable_blob_col: usersFields.nullable_blob_col;
+  nullable_char_col: usersFields.nullable_char_col;
+  nullable_date_col: usersFields.nullable_date_col;
+  nullable_datetime_col: usersFields.nullable_datetime_col;
+  nullable_decimal_col: usersFields.nullable_decimal_col;
+  nullable_double_col: usersFields.nullable_double_col;
+  nullable_enum_col: usersFields.nullable_enum_col;
+  nullable_float_col: usersFields.nullable_float_col;
+  nullable_geometry_col: usersFields.nullable_geometry_col;
+  nullable_int_col: usersFields.nullable_int_col;
+  nullable_integer_col: usersFields.nullable_integer_col;
+  nullable_longblob_col: usersFields.nullable_longblob_col;
+  nullable_longtext_col: usersFields.nullable_longtext_col;
+  nullable_mediumblob_col: usersFields.nullable_mediumblob_col;
+  nullable_mediumint_col: usersFields.nullable_mediumint_col;
+  nullable_mediumtext_col: usersFields.nullable_mediumtext_col;
+  nullable_numeric_col: usersFields.nullable_numeric_col;
+  nullable_set_col: usersFields.nullable_set_col;
+  nullable_smallint_col: usersFields.nullable_smallint_col;
+  nullable_text_col: usersFields.nullable_text_col;
+  nullable_time_col: usersFields.nullable_time_col;
+  nullable_tinyblob_col: usersFields.nullable_tinyblob_col;
+  nullable_tinyint_col: usersFields.nullable_tinyint_col;
+  nullable_tinytext_col: usersFields.nullable_tinytext_col;
+  nullable_varbinary_col: usersFields.nullable_varbinary_col;
+  nullable_year_col: usersFields.nullable_year_col;
+  numeric_col: usersFields.numeric_col;
+  set_col: usersFields.set_col;
+  smallint_col: usersFields.smallint_col;
+  text_col: usersFields.text_col;
+  time_col: usersFields.time_col;
+  timestamp_col: usersFields.timestamp_col;
+  tinyblob_col: usersFields.tinyblob_col;
+  tinyint_col: usersFields.tinyint_col;
+  tinytext_col: usersFields.tinytext_col;
+  varbinary_col: usersFields.varbinary_col;
+  year_col: usersFields.year_col;
+
+}
+
+export namespace user_enumsFields {
+  export type enum_col = enum_enum_col;
+  export type nullable_enum_col = enum_nullable_enum_col | null;
+  export type nullable_set_col = set_nullable_set_col | null;
+  export type set_col = set_set_col;
+
+}
+
+export interface user_enums {
+  enum_col: user_enumsFields.enum_col;
+  nullable_enum_col: user_enumsFields.nullable_enum_col;
+  nullable_set_col: user_enumsFields.nullable_set_col;
+  set_col: user_enumsFields.set_col;
+
+}
+
+export namespace packageFields {
+  export type number_ = number;
+  export type string_ = string;
+
+}
+
+export interface package_ {
+  number: packageFields.number_;
+  string: packageFields.string_;
+
+}
+"
+`;
+
+exports[`schema generation integration testing mysql Camelcase generation 1`] = `
+"/* tslint:disable */
+
+export type EnumEnumCol = 'enum1' | 'enum2' | 'enum3';
+export type EnumNullableEnumCol = 'enum1' | 'enum2' | 'enum3';
+export type SetNullableSetCol = 'set1' | 'set2' | 'set3';
+export type SetSetCol = 'set1' | 'set2' | 'set3';
+
+export namespace UsersFields {
+  export type bigintCol = number;
+  export type binaryCol = Buffer;
+  export type bitCol = Buffer;
+  export type blobCol = Buffer;
+  export type charCol = string;
+  export type dateCol = Date;
+  export type datetimeCol = Date;
+  export type decimalCol = number;
+  export type doubleCol = number;
+  export type enumCol = EnumEnumCol;
+  export type floatCol = number;
+  export type geometryCol = string;
+  export type intCol = number;
+  export type integerCol = number;
+  export type longblobCol = Buffer;
+  export type longtextCol = string;
+  export type mediumblobCol = Buffer;
+  export type mediumintCol = number;
+  export type mediumtextCol = string;
+  export type nullableBigintCol = number | null;
+  export type nullableBinaryCol = Buffer | null;
+  export type nullableBitCol = Buffer | null;
+  export type nullableBlobCol = Buffer | null;
+  export type nullableCharCol = string | null;
+  export type nullableDateCol = Date | null;
+  export type nullableDatetimeCol = Date | null;
+  export type nullableDecimalCol = number | null;
+  export type nullableDoubleCol = number | null;
+  export type nullableEnumCol = EnumNullableEnumCol | null;
+  export type nullableFloatCol = number | null;
+  export type nullableGeometryCol = string | null;
+  export type nullableIntCol = number | null;
+  export type nullableIntegerCol = number | null;
+  export type nullableLongblobCol = Buffer | null;
+  export type nullableLongtextCol = string | null;
+  export type nullableMediumblobCol = Buffer | null;
+  export type nullableMediumintCol = number | null;
+  export type nullableMediumtextCol = string | null;
+  export type nullableNumericCol = number | null;
+  export type nullableSetCol = SetNullableSetCol | null;
+  export type nullableSmallintCol = number | null;
+  export type nullableTextCol = string | null;
+  export type nullableTimeCol = string | null;
+  export type nullableTinyblobCol = Buffer | null;
+  export type nullableTinyintCol = boolean | null;
+  export type nullableTinytextCol = string | null;
+  export type nullableVarbinaryCol = Buffer | null;
+  export type nullableYearCol = number | null;
+  export type numericCol = number;
+  export type setCol = SetSetCol;
+  export type smallintCol = number;
+  export type textCol = string;
+  export type timeCol = string;
+  export type timestampCol = Date;
+  export type tinyblobCol = Buffer;
+  export type tinyintCol = boolean;
+  export type tinytextCol = string;
+  export type varbinaryCol = Buffer;
+  export type yearCol = number;
+
+}
+
+export interface Users {
+  bigintCol: UsersFields.bigintCol;
+  binaryCol: UsersFields.binaryCol;
+  bitCol: UsersFields.bitCol;
+  blobCol: UsersFields.blobCol;
+  charCol: UsersFields.charCol;
+  dateCol: UsersFields.dateCol;
+  datetimeCol: UsersFields.datetimeCol;
+  decimalCol: UsersFields.decimalCol;
+  doubleCol: UsersFields.doubleCol;
+  enumCol: UsersFields.enumCol;
+  floatCol: UsersFields.floatCol;
+  geometryCol: UsersFields.geometryCol;
+  intCol: UsersFields.intCol;
+  integerCol: UsersFields.integerCol;
+  longblobCol: UsersFields.longblobCol;
+  longtextCol: UsersFields.longtextCol;
+  mediumblobCol: UsersFields.mediumblobCol;
+  mediumintCol: UsersFields.mediumintCol;
+  mediumtextCol: UsersFields.mediumtextCol;
+  nullableBigintCol: UsersFields.nullableBigintCol;
+  nullableBinaryCol: UsersFields.nullableBinaryCol;
+  nullableBitCol: UsersFields.nullableBitCol;
+  nullableBlobCol: UsersFields.nullableBlobCol;
+  nullableCharCol: UsersFields.nullableCharCol;
+  nullableDateCol: UsersFields.nullableDateCol;
+  nullableDatetimeCol: UsersFields.nullableDatetimeCol;
+  nullableDecimalCol: UsersFields.nullableDecimalCol;
+  nullableDoubleCol: UsersFields.nullableDoubleCol;
+  nullableEnumCol: UsersFields.nullableEnumCol;
+  nullableFloatCol: UsersFields.nullableFloatCol;
+  nullableGeometryCol: UsersFields.nullableGeometryCol;
+  nullableIntCol: UsersFields.nullableIntCol;
+  nullableIntegerCol: UsersFields.nullableIntegerCol;
+  nullableLongblobCol: UsersFields.nullableLongblobCol;
+  nullableLongtextCol: UsersFields.nullableLongtextCol;
+  nullableMediumblobCol: UsersFields.nullableMediumblobCol;
+  nullableMediumintCol: UsersFields.nullableMediumintCol;
+  nullableMediumtextCol: UsersFields.nullableMediumtextCol;
+  nullableNumericCol: UsersFields.nullableNumericCol;
+  nullableSetCol: UsersFields.nullableSetCol;
+  nullableSmallintCol: UsersFields.nullableSmallintCol;
+  nullableTextCol: UsersFields.nullableTextCol;
+  nullableTimeCol: UsersFields.nullableTimeCol;
+  nullableTinyblobCol: UsersFields.nullableTinyblobCol;
+  nullableTinyintCol: UsersFields.nullableTinyintCol;
+  nullableTinytextCol: UsersFields.nullableTinytextCol;
+  nullableVarbinaryCol: UsersFields.nullableVarbinaryCol;
+  nullableYearCol: UsersFields.nullableYearCol;
+  numericCol: UsersFields.numericCol;
+  setCol: UsersFields.setCol;
+  smallintCol: UsersFields.smallintCol;
+  textCol: UsersFields.textCol;
+  timeCol: UsersFields.timeCol;
+  timestampCol: UsersFields.timestampCol;
+  tinyblobCol: UsersFields.tinyblobCol;
+  tinyintCol: UsersFields.tinyintCol;
+  tinytextCol: UsersFields.tinytextCol;
+  varbinaryCol: UsersFields.varbinaryCol;
+  yearCol: UsersFields.yearCol;
+
+}
+
+export namespace UserEnumsFields {
+  export type enumCol = EnumEnumCol;
+  export type nullableEnumCol = EnumNullableEnumCol | null;
+  export type nullableSetCol = SetNullableSetCol | null;
+  export type setCol = SetSetCol;
+
+}
+
+export interface UserEnums {
+  enumCol: UserEnumsFields.enumCol;
+  nullableEnumCol: UserEnumsFields.nullableEnumCol;
+  nullableSetCol: UserEnumsFields.nullableSetCol;
+  setCol: UserEnumsFields.setCol;
+
+}
+
+export namespace PackageFields {
+  export type number_ = number;
+  export type string_ = string;
+
+}
+
+export interface Package {
+  number: PackageFields.number_;
+  string: PackageFields.string_;
+
+}
+"
+`;

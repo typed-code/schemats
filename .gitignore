@@ -338,6 +338,7 @@ paket-files/
 
 typings/
 __tests__/actual/*
+__tests__/fixture/**/*.js
 coverage/
 dist/
 .DS_Store
