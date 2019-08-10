@@ -9,66 +9,66 @@ import * as yargs from 'yargs';
 import { typescriptOfSchema } from '../src';
 
 interface SchematsConfig {
-    conn: string;
-    output: string;
-    table?: string[] | string;
-    schema?: string;
-    camelCase?: boolean;
-    noHeader?: boolean;
+  conn: string;
+  output: string;
+  table?: string[] | string;
+  schema?: string;
+  camelCase?: boolean;
+  noHeader?: boolean;
 }
 
 const argv: SchematsConfig = yargs
-    .usage('Usage: $0 <command> [options]')
-    .global('config')
-    .default('config', '../schemats.json')
-    .config()
-    .env('SCHEMATS')
-    .command('generate', 'generate type definition')
-    .demand(1)
-    .example(
-        '$0 generate -c postgres://username:password@localhost/db -t table1 -t table2 -s schema -o interface_output.ts',
-        'generate typescript interfaces from schema'
-    )
-    .demand('c')
-    .alias('c', 'conn')
-    .nargs('c', 1)
-    .describe('c', 'database connection string')
-    .alias('t', 'table')
-    .nargs('t', 1)
-    .describe('t', 'table name')
-    .alias('s', 'schema')
-    .nargs('s', 1)
-    .describe('s', 'schema name')
-    .alias('C', 'camelCase')
-    .describe('C', 'Camel-case columns')
-    .describe('noHeader', 'Do not write header')
-    .demand('o')
-    .nargs('o', 1)
-    .alias('o', 'output')
-    .describe('o', 'output file name')
-    .help('h')
-    .alias('h', 'help').argv as SchematsConfig;
+  .usage('Usage: $0 <command> [options]')
+  .global('config')
+  .default('config', '../schemats.json')
+  .config()
+  .env('SCHEMATS')
+  .command('generate', 'generate type definition')
+  .demand(1)
+  .example(
+    '$0 generate -c postgres://username:password@localhost/db -t table1 -t table2 -s schema -o interface_output.ts',
+    'generate typescript interfaces from schema'
+  )
+  .demand('c')
+  .alias('c', 'conn')
+  .nargs('c', 1)
+  .describe('c', 'database connection string')
+  .alias('t', 'table')
+  .nargs('t', 1)
+  .describe('t', 'table name')
+  .alias('s', 'schema')
+  .nargs('s', 1)
+  .describe('s', 'schema name')
+  .alias('C', 'camelCase')
+  .describe('C', 'Camel-case columns')
+  .describe('noHeader', 'Do not write header')
+  .demand('o')
+  .nargs('o', 1)
+  .alias('o', 'output')
+  .describe('o', 'output file name')
+  .help('h')
+  .alias('h', 'help').argv as SchematsConfig;
 
 (async () => {
-    try {
-        if (!Array.isArray(argv.table)) {
-            argv.table = !argv.table ? [] : [argv.table];
-        }
-
-        const formattedOutput = await typescriptOfSchema(argv.conn, argv.table, argv.schema, {
-            camelCase: argv.camelCase,
-            writeHeader: !argv.noHeader,
-        });
-        fs.writeFileSync(argv.output, formattedOutput);
-    } catch (e) {
-        console.error(e);
-        process.exit(1);
+  try {
+    if (!Array.isArray(argv.table)) {
+      argv.table = !argv.table ? [] : [argv.table];
     }
-})()
-    .then(() => {
-        process.exit();
-    })
-    .catch((e: any) => {
-        console.warn(e);
-        process.exit(1);
+
+    const formattedOutput = await typescriptOfSchema(argv.conn, argv.table, argv.schema, {
+      camelCase: argv.camelCase,
+      writeHeader: !argv.noHeader,
     });
+    fs.writeFileSync(argv.output, formattedOutput);
+  } catch (e) {
+    console.error(e);
+    process.exit(1);
+  }
+})()
+  .then(() => {
+    process.exit();
+  })
+  .catch((e: any) => {
+    console.warn(e);
+    process.exit(1);
+  });

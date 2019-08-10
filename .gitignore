@@ -337,7 +337,7 @@ paket-files/
 *.sln.iml
 
 typings/
-test/actual/*
+__tests__/actual/*
 coverage/
 dist/
 .DS_Store

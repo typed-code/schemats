@@ -9,8 +9,14 @@
     "no-var-requires": false,
     "object-literal-sort-keys": false,
     "member-ordering": false,
-    "no-console": [true, "log"],
-    "no-implicit-dependencies": [true, "dev"],
+    "no-console": [
+      true,
+      "log"
+    ],
+    "no-implicit-dependencies": [
+      true,
+      "dev"
+    ],
     "quotemark": [
       true,
       "single"

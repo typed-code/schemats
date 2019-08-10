@@ -1,9 +1,10 @@
 {
   "name": "@typed-code/schemats",
   "version": "4.0.0",
-  "description": "Generate typescript interface definitions from (postgres) SQL database schema",
+  "description": "Generate typescript interface definitions from (Postgres or MySql) SQL database schema",
   "keywords": [
     "postgres",
+    "mysql",
     "schema",
     "typescript",
     "sql"
@@ -14,10 +15,9 @@
     "lint": "tslint --project tsconfig.json --fix",
     "build": "tsc",
     "pretest": "npm run lint && npm run build",
-    "test": "nyc mocha",
+    "test": "jest",
     "prepublish": "npm run build",
-    "clean": "del-cli node_modules **/*.js",
-    "coverage": "nyc report --reporter=text-lcov | coveralls"
+    "clean": "del-cli node_modules **/*.js"
   },
   "bin": {
     "schemats": "dist/bin/schemats.js"
@@ -39,25 +39,16 @@
   "devDependencies": {
     "@types/bluebird": "^3.5.26",
     "@types/diff": "^4.0.1",
+    "@types/jest": "^24.0.13",
     "@types/lodash": "^4.14.123",
-    "@types/mocha": "^5.2.6",
     "@types/mysql": "2.15.5",
     "@types/mz": "^0.0.32",
     "@types/node": "^11.11.3",
-    "@types/power-assert": "^1.5.0",
-    "@types/proxyquire": "^1.3.28",
-    "@types/sinon": "^7.0.10",
     "@types/yargs": "^12.0.9",
-    "coveralls": "^3.0.3",
     "del-cli": "^1.1.0",
-    "istanbul": "^0.4.5",
-    "mocha": "^6.0.2",
-    "nyc": "^13.3.0",
-    "power-assert": "^1.6.1",
+    "jest": "^24.8.0",
     "prettier": "^1.16.4",
-    "proxyquire": "^2.1.0",
-    "sinon": "^7.2.7",
-    "source-map-support": "^0.5.11",
+    "ts-jest": "^24.0.2",
     "ts-node": "^8.0.3",
     "tslint": "^5.14.0",
     "tslint-config-prettier": "^1.18.0"
@@ -72,5 +63,11 @@
     "typescript": "^3.3.3333",
     "typescript-formatter": "^7.2.2",
     "yargs": "^13.2.2"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "transform": {
+      "^.+\\.ts$": "ts-jest"
+    }
   }
 }

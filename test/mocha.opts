@@ -1,5 +1,0 @@
---recursive
---reporter spec
---slow 500
---timeout 10000
-dist/test/**/*.test.js

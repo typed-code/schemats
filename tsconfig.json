@@ -1,26 +1,29 @@
 {
-    "compilerOptions": {
-        "module": "commonjs",
-        "target": "es5",
-        "outDir": "dist",
-        "lib": ["es2015", "es2017"],
-        "noImplicitAny": true,
-        "declaration": true,
-        "strictNullChecks": true,
-        "newLine": "LF",
-        "sourceMap": true
-    },
-    "exclude": [
-        "node_modules",
-        "dts",
-        "test/actual",
-        "test/expected",
-        "test/fixture",
-        "**/*.d.ts"
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es2016",
+    "outDir": "dist",
+    "lib": [
+      "es2015",
+      "es2017"
     ],
-    "include": [
-        "src/**/*.ts",
-        "test/**/*.test.ts",
-        "bin/**/*.ts"
-    ]
+    "noImplicitAny": true,
+    "declaration": true,
+    "strictNullChecks": true,
+    "newLine": "LF",
+    "sourceMap": true
+  },
+  "exclude": [
+    "node_modules",
+    "dts",
+    "__tests__/actual",
+    "__tests__/expected",
+    "__tests__/fixture",
+    "**/*.d.ts"
+  ],
+  "include": [
+    "src/**/*.ts",
+    "__tests__/**/*.test.ts",
+    "bin/**/*.ts"
+  ]
 }

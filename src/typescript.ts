@@ -9,32 +9,32 @@ import Options from './options';
 import { TableDefinition } from './schemaInterfaces';
 
 function nameIsReservedKeyword(name: string): boolean {
-    const reservedKeywords = ['string', 'number', 'package'];
-    return reservedKeywords.indexOf(name) !== -1;
+  const reservedKeywords = ['string', 'number', 'package'];
+  return reservedKeywords.indexOf(name) !== -1;
 }
 
 function normalizeName(name: string, options: Options): string {
-    if (nameIsReservedKeyword(name)) {
-        return name + '_';
-    } else {
-        return name;
-    }
+  if (nameIsReservedKeyword(name)) {
+    return name + '_';
+  } else {
+    return name;
+  }
 }
 
 export function generateTableInterface(
-    tableNameRaw: string,
-    tableDefinition: TableDefinition,
-    options: Options
+  tableNameRaw: string,
+  tableDefinition: TableDefinition,
+  options: Options
 ) {
-    const tableName = options.transformTypeName(tableNameRaw);
-    let members = '';
-    Object.keys(tableDefinition)
-        .map(c => options.transformColumnName(c))
-        .forEach(columnName => {
-            members += `${columnName}: ${tableName}Fields.${normalizeName(columnName, options)};\n`;
-        });
+  const tableName = options.transformTypeName(tableNameRaw);
+  let members = '';
+  Object.keys(tableDefinition)
+    .map(c => options.transformColumnName(c))
+    .forEach(columnName => {
+      members += `${columnName}: ${tableName}Fields.${normalizeName(columnName, options)};\n`;
+    });
 
-    return `
+  return `
         export interface ${normalizeName(tableName, options)} {
         ${members}
         }
@@ -42,33 +42,33 @@ export function generateTableInterface(
 }
 
 export function generateEnumType(enumObject: any, options: Options) {
-    let enumString = '';
-    for (const enumNameRaw in enumObject) {
-        if (enumObject.hasOwnProperty(enumNameRaw)) {
-            const enumName = options.transformTypeName(enumNameRaw);
-            enumString += `export type ${enumName} = `;
-            enumString += enumObject[enumNameRaw].map((v: string) => `'${v}'`).join(' | ');
-            enumString += ';\n';
-        }
+  let enumString = '';
+  for (const enumNameRaw in enumObject) {
+    if (enumObject.hasOwnProperty(enumNameRaw)) {
+      const enumName = options.transformTypeName(enumNameRaw);
+      enumString += `export type ${enumName} = `;
+      enumString += enumObject[enumNameRaw].map((v: string) => `'${v}'`).join(' | ');
+      enumString += ';\n';
     }
-    return enumString;
+  }
+  return enumString;
 }
 
 export function generateTableTypes(
-    tableNameRaw: string,
-    tableDefinition: TableDefinition,
-    options: Options
+  tableNameRaw: string,
+  tableDefinition: TableDefinition,
+  options: Options
 ) {
-    const tableName = options.transformTypeName(tableNameRaw);
-    let fields = '';
-    Object.keys(tableDefinition).forEach(columnNameRaw => {
-        const type = tableDefinition[columnNameRaw].tsType;
-        const nullable = tableDefinition[columnNameRaw].nullable ? '| null' : '';
-        const columnName = options.transformColumnName(columnNameRaw);
-        fields += `export type ${normalizeName(columnName, options)} = ${type}${nullable};\n`;
-    });
+  const tableName = options.transformTypeName(tableNameRaw);
+  let fields = '';
+  Object.keys(tableDefinition).forEach(columnNameRaw => {
+    const type = tableDefinition[columnNameRaw].tsType;
+    const nullable = tableDefinition[columnNameRaw].nullable ? '| null' : '';
+    const columnName = options.transformColumnName(columnNameRaw);
+    fields += `export type ${normalizeName(columnName, options)} = ${type}${nullable};\n`;
+  });
 
-    return `
+  return `
         export namespace ${tableName}Fields {
         ${fields}
         }
