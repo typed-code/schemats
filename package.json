@@ -37,36 +37,39 @@
   ],
   "license": "MIT",
   "devDependencies": {
-    "@types/bluebird": "^3.5.26",
-    "@types/diff": "^4.0.1",
-    "@types/jest": "^24.0.13",
-    "@types/lodash": "^4.14.123",
+    "@types/diff": "^4.0.2",
+    "@types/jest": "^24.0.17",
+    "@types/lodash": "^4.14.136",
     "@types/mysql": "2.15.5",
     "@types/mz": "^0.0.32",
-    "@types/node": "^11.11.3",
-    "@types/yargs": "^12.0.9",
+    "@types/node": "^11.13.19",
+    "@types/yargs": "^12.0.12",
     "del-cli": "^1.1.0",
     "jest": "^24.8.0",
-    "prettier": "^1.16.4",
+    "prettier": "^1.18.2",
     "ts-jest": "^24.0.2",
-    "ts-node": "^8.0.3",
-    "tslint": "^5.14.0",
+    "ts-node": "^8.3.0",
+    "tslint": "^5.18.0",
     "tslint-config-prettier": "^1.18.0"
   },
   "dependencies": {
-    "bluebird": "^3.5.3",
     "diff": "^4.0.1",
-    "lodash": "^4.17.11",
-    "mysql": "^2.16.0",
+    "lodash": "^4.17.15",
+    "mysql": "^2.17.1",
     "mz": "^2.7.0",
-    "pg-promise": "^8.6.4",
-    "typescript": "^3.3.3333",
+    "pg-promise": "^8.7.5",
+    "typescript": "^3.5.3",
     "typescript-formatter": "^7.2.2",
-    "yargs": "^13.2.2"
+    "yargs": "^13.3.0"
   },
   "jest": {
-    "testMatch": [ "**/__tests__/**/*.test.[j|t]s?(x)" ],
-    "testPathIgnorePatterns": ["/node_modules/", "/dist/"],
+    "testMatch": [
+      "**/__tests__/**/*.test.[j|t]s?(x)"
+    ],
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/dist/"
+    ],
     "testEnvironment": "node",
     "transform": {
       "^.+\\.ts$": "ts-jest"
