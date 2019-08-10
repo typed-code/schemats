@@ -1,13 +1,8 @@
 import { spawnSync } from 'child_process';
+import { condDescribe } from '../testUtility';
 
 describe('schemats cli tool integration testing', () => {
-  describe('schemats generate postgres', () => {
-    beforeAll(async function() {
-      if (!process.env.POSTGRES_URL) {
-        return this.skip();
-      }
-    });
-
+  condDescribe(!!process.env.POSTGRES_URL, 'schemats generate postgres', () => {
     it('should run without error', () => {
       const { status, stdout, stderr } = spawnSync(
         'node',
@@ -28,13 +23,7 @@ describe('schemats cli tool integration testing', () => {
     });
   });
 
-  describe('schemats generate mysql', () => {
-    beforeAll(async function() {
-      if (!process.env.MYSQL_URL) {
-        return this.skip();
-      }
-    });
-
+  condDescribe(!!process.env.MYSQL_URL, 'schemats generate mysql', () => {
     it('should run without error', () => {
       const { status } = spawnSync('node', [
         'dist/bin/schemats',
@@ -44,7 +33,7 @@ describe('schemats cli tool integration testing', () => {
         '-s',
         'test',
         '-o',
-        '/tmp/schemats_cli_postgres.ts',
+        '/tmp/schemats_cli_mysql.ts',
       ]);
 
       expect(status).toBe(0);

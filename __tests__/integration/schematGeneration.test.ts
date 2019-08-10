@@ -1,15 +1,12 @@
 import { Database, getDatabase } from '../../src/index';
-import { loadSchema, writeTsFile } from '../testUtility';
+import { condDescribe, loadSchema, writeTsFile } from '../testUtility';
 
 describe('schemat generation integration testing', () => {
-  describe('postgres', () => {
+  condDescribe(!!process.env.POSTGRES_URL, 'postgres', () => {
     let db: Database;
 
-    beforeAll(async function() {
-      if (!process.env.POSTGRES_URL) {
-        return this.skip();
-      }
-      db = getDatabase(process.env.POSTGRES_URL);
+    beforeAll(async () => {
+      db = getDatabase(process.env.POSTGRES_URL as string);
       await loadSchema(db, './test/fixture/postgres/initCleanup.sql');
     });
 
@@ -32,13 +29,10 @@ describe('schemat generation integration testing', () => {
     });
   });
 
-  describe('mysql', () => {
+  condDescribe(!!process.env.MYSQL_URL, 'mysql', () => {
     let db: Database;
 
-    beforeAll(async function() {
-      if (!process.env.MYSQL_URL) {
-        return this.skip();
-      }
+    beforeAll(async () => {
       db = getDatabase(`${process.env.MYSQL_URL}?multipleStatements=true`);
       await loadSchema(db, './test/fixture/mysql/initCleanup.sql');
     });

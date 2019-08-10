@@ -60,3 +60,11 @@ export async function writeTsFile(
   });
   await fs.writeFile(path.resolve(outputFile), formattedOutput);
 }
+
+export function condDescribe(cond: boolean, ...args: any[]) {
+  if(cond) {
+    describe.apply(this, args);
+  } else {
+    describe.skip.apply(this, args);
+  }
+}
