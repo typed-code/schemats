@@ -41,7 +41,7 @@ export function generateTableInterface(
     `;
 }
 
-export function generateEnumType(enumObject: any, options: Options) {
+export function generateEnumType(enumObject: { [key: string]: string[] }, options: Options) {
   let enumString = '';
   for (const enumNameRaw in enumObject) {
     if (enumObject.hasOwnProperty(enumNameRaw)) {

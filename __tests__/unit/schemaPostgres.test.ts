@@ -148,7 +148,7 @@ describe('PostgresDatabase', () => {
         'SELECT table_name ' +
           'FROM information_schema.columns ' +
           'WHERE table_schema = $1 ' +
-          'GROUP BY table_name',
+          'GROUP BY table_name ORDER BY table_name',
         ['schemaName'],
         expect.any(Function)
       );

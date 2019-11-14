@@ -17,6 +17,10 @@ describe('MysqlDatabase', () => {
     mysqlProxy = new MysqlDatabase('mysql://user:password@localhost/test');
   });
 
+  beforeEach(() => {
+    db.resetMocks()
+  });
+
   describe('query', () => {
     it('query calls query async', async () => {
       db.mysqlStub.withResults([]);
@@ -76,8 +80,8 @@ describe('MysqlDatabase', () => {
       await mysqlProxy.getEnumTypes('testschema');
       expect(db.mysqlStub.query).toHaveBeenCalledWith(
         'SELECT column_name, column_type, data_type ' +
-          'FROM information_schema.columns ' +
-          `WHERE data_type IN ('enum', 'set') and table_schema = ?`,
+        'FROM information_schema.columns ' +
+        `WHERE data_type IN ('enum', 'set') and table_schema = ? ORDER BY column_name`,
         ['testschema'],
         expect.any(Function)
       );
@@ -89,8 +93,8 @@ describe('MysqlDatabase', () => {
       await mysqlProxy.getEnumTypes();
       expect(db.mysqlStub.query).toHaveBeenCalledWith(
         'SELECT column_name, column_type, data_type ' +
-          'FROM information_schema.columns ' +
-          `WHERE data_type IN ('enum', 'set') `,
+        'FROM information_schema.columns ' +
+        `WHERE data_type IN ('enum', 'set') ORDER BY column_name`,
         [],
         expect.any(Function)
       );
@@ -144,8 +148,8 @@ describe('MysqlDatabase', () => {
       await mysqlProxy.getTableDefinition('testtable', 'testschema');
       expect(db.mysqlStub.query).toHaveBeenCalledWith(
         'SELECT column_name, data_type, is_nullable ' +
-          'FROM information_schema.columns ' +
-          'WHERE table_name = ? and table_schema = ?',
+        'FROM information_schema.columns ' +
+        'WHERE table_name = ? and table_schema = ? ORDER BY column_name',
         ['testtable', 'testschema'],
         expect.any(Function)
       );
@@ -233,9 +237,9 @@ describe('MysqlDatabase', () => {
       await mysqlProxy.getSchemaTables('testschema');
       expect(db.mysqlStub.query).toHaveBeenCalledWith(
         'SELECT table_name ' +
-          'FROM information_schema.columns ' +
-          'WHERE table_schema = ? ' +
-          'GROUP BY table_name',
+        'FROM information_schema.columns ' +
+        'WHERE table_schema = ? ' +
+        'GROUP BY table_name ORDER BY table_name',
         ['testschema'],
         expect.any(Function)
       );

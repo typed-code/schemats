@@ -89,9 +89,7 @@ export class PostgresDatabase implements Database {
           } else {
             // tslint:disable-next-line
             console.log(
-              `Type [${
-                column.udtName
-                } has been mapped to [any] because no specific type has been found.`
+              `Type [${column.udtName} has been mapped to [any] because no specific type has been found.`
             );
             column.tsType = 'any';
             return column;
@@ -104,7 +102,7 @@ export class PostgresDatabase implements Database {
     return this.db.query(queryString);
   }
 
-  public async getEnumTypes(schema?: string) {
+  public async getEnumTypes(schema?: string): Promise<{ [key: string]: string[] }> {
     interface T {
       name: string;
       value: any;
@@ -114,11 +112,11 @@ export class PostgresDatabase implements Database {
     const enumSchemaWhereClause = schema ? pgp.as.format(`where n.nspname = $1`, schema) : '';
     await this.db.each<T>(
       'select n.nspname as schema, t.typname as name, e.enumlabel as value ' +
-      'from pg_type t ' +
-      'join pg_enum e on t.oid = e.enumtypid ' +
-      'join pg_catalog.pg_namespace n ON n.oid = t.typnamespace ' +
-      `${enumSchemaWhereClause} ` +
-      'order by t.typname asc, e.enumlabel asc;',
+        'from pg_type t ' +
+        'join pg_enum e on t.oid = e.enumtypid ' +
+        'join pg_catalog.pg_namespace n ON n.oid = t.typnamespace ' +
+        `${enumSchemaWhereClause} ` +
+        'order by t.typname asc, e.enumlabel asc;',
       [],
       (item: T) => {
         if (!enums[item.name]) {
@@ -141,8 +139,8 @@ export class PostgresDatabase implements Database {
 
     await this.db.each<T>(
       'SELECT column_name, udt_name, is_nullable ' +
-      'FROM information_schema.columns ' +
-      'WHERE table_name = $1 and table_schema = $2',
+        'FROM information_schema.columns ' +
+        'WHERE table_name = $1 and table_schema = $2',
       [tableName, tableSchema],
       (schemaItem: T) => {
         tableDefinition[schemaItem.column_name] = {
@@ -167,9 +165,9 @@ export class PostgresDatabase implements Database {
   public async getSchemaTables(schemaName: string): Promise<string[]> {
     return this.db.map<string>(
       'SELECT table_name ' +
-      'FROM information_schema.columns ' +
-      'WHERE table_schema = $1 ' +
-      'GROUP BY table_name',
+        'FROM information_schema.columns ' +
+        'WHERE table_schema = $1 ' +
+        'GROUP BY table_name ORDER BY table_name',
       [schemaName],
       (schemaItem: { table_name: string }) => schemaItem.table_name
     );

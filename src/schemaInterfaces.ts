@@ -17,15 +17,11 @@ export interface Database {
 
   getDefaultSchema(): string;
 
-  getEnumTypes(schema?: string): any;
+  getEnumTypes(schema?: string): Promise<{ [key: string]: string[] }>;
 
   getTableDefinition(tableName: string, tableSchema: string): Promise<TableDefinition>;
 
-  getTableTypes(
-    tableName: string,
-    tableSchema: string,
-    options: Options
-  ): Promise<TableDefinition>;
+  getTableTypes(tableName: string, tableSchema: string, options: Options): Promise<TableDefinition>;
 
   getSchemaTables(schemaName: string): Promise<string[]>;
 }

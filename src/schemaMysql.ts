@@ -77,9 +77,7 @@ export class MysqlDatabase implements Database {
           } else {
             // tslint:disable-next-line
             console.log(
-              `Type [${
-                column.udtName
-                }] has been mapped to [any] because no specific type has been found.`
+              `Type [${column.udtName}] has been mapped to [any] because no specific type has been found.`
             );
             column.tsType = 'any';
             return column;
@@ -100,43 +98,44 @@ export class MysqlDatabase implements Database {
     return this.queryAsync(queryString);
   }
 
-  public async getEnumTypes(schema?: string) {
-    const enums: any = {};
-    let enumSchemaWhereClause: string;
-    let params: string[];
+  public async getEnumTypes(schema?: string): Promise<{ [key: string]: string[] }> {
+    let enumSchemaWhereClause: string = '';
+    const params: string[] = [];
     if (schema) {
-      enumSchemaWhereClause = `and table_schema = ?`;
-      params = [schema];
-    } else {
-      enumSchemaWhereClause = '';
-      params = [];
+      enumSchemaWhereClause = `and table_schema = ? `;
+      params.push(schema);
     }
+
     const rawEnumRecords = await this.queryAsync(
       'SELECT column_name, column_type, data_type ' +
-      'FROM information_schema.columns ' +
-      `WHERE data_type IN ('enum', 'set') ${enumSchemaWhereClause}`,
+        'FROM information_schema.columns ' +
+        `WHERE data_type IN ('enum', 'set') ${enumSchemaWhereClause}ORDER BY column_name`,
       params
     );
 
-    rawEnumRecords.forEach(
-      (enumItem: { column_name: string; column_type: string; data_type: string }) => {
+    return rawEnumRecords.reduce(
+      (enums, enumItem: { column_name: string; column_type: string; data_type: string }) => {
         const enumName = MysqlDatabase.getEnumNameFromColumn(
           enumItem.data_type,
           enumItem.column_name
         );
         const enumValues = MysqlDatabase.parseMysqlEnumeration(enumItem.column_type);
+
         if (enums[enumName] && !isEqual(enums[enumName], enumValues)) {
           const errorMsg =
             `Multiple enums with the same name and contradicting types were found: ` +
-            `${enumItem.column_name}: ${JSON.stringify(
-              enums[enumName]
-            )} and ${JSON.stringify(enumValues)}`;
+            `${enumItem.column_name}: ${JSON.stringify(enums[enumName])} and ${JSON.stringify(
+              enumValues
+            )}`;
           throw new Error(errorMsg);
         }
+
         enums[enumName] = enumValues;
-      }
+
+        return enums;
+      },
+      {} as any
     );
-    return enums;
   }
 
   public async getTableDefinition(tableName: string, tableSchema: string) {
@@ -144,8 +143,8 @@ export class MysqlDatabase implements Database {
 
     const tableColumns = await this.queryAsync(
       'SELECT column_name, data_type, is_nullable ' +
-      'FROM information_schema.columns ' +
-      'WHERE table_name = ? and table_schema = ?',
+        'FROM information_schema.columns ' +
+        'WHERE table_name = ? and table_schema = ? ORDER BY column_name',
       [tableName, tableSchema]
     );
     tableColumns.map(
@@ -176,9 +175,9 @@ export class MysqlDatabase implements Database {
   public async getSchemaTables(schemaName: string): Promise<string[]> {
     const schemaTables = await this.queryAsync(
       'SELECT table_name ' +
-      'FROM information_schema.columns ' +
-      'WHERE table_schema = ? ' +
-      'GROUP BY table_name',
+        'FROM information_schema.columns ' +
+        'WHERE table_schema = ? ' +
+        'GROUP BY table_name ORDER BY table_name',
       [schemaName]
     );
     return schemaTables.map((schemaItem: { table_name: string }) => schemaItem.table_name);
@@ -201,13 +200,10 @@ export class MysqlDatabase implements Database {
 
   private toLowerCaseColumnName(results: object[]): object[] {
     return results.map((row: any) =>
-      Object.keys(row).reduce(
-        (newRow, key) => {
-          newRow[key.toLowerCase()] = row[key];
-          return newRow;
-        },
-        {} as any
-      )
+      Object.keys(row).reduce((newRow, key) => {
+        newRow[key.toLowerCase()] = row[key];
+        return newRow;
+      }, {} as any)
     );
   }
 }
