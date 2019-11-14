@@ -1,9 +1,7 @@
-# SchemaTS
+# @typed-code/SchemaTS
 
 [![npm](https://img.shields.io/npm/v/schemats.svg)](https://www.npmjs.com/package/schemats)
-[![GitHub tag](https://img.shields.io/github/tag/typed-code/schemats.svg)](https://github.com/typed-code/schemats)
-[![TravisCI Build Status](https://travis-ci.org/typed-code/schemats.svg?branch=master)](https://travis-ci.org/typed-code/schemats)
-[![Coverage Status](https://coveralls.io/repos/github/typed-code/schemats/badge.svg?branch=coverage)](https://coveralls.io/github/typed-code/schemats?branch=coverage)
+[![CircleCI](https://circleci.com/gh/typed-code/schemats.svg?style=svg)](https://circleci.com/gh/typed-code/schemats)
 
 **This is a fork of [SweetIQ/schemats](https://github.com/SweetIQ/schemats) which is not maintained anymore.**
 
