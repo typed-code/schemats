@@ -3,3 +3,4 @@ demo2.gif
 __tests__/artifacts
 **/*[^.d$].ts
 coverage/
+.idea

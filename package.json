@@ -11,6 +11,10 @@
   ],
   "main": "./dist/src/index.js",
   "types": "./dist/src/index.d.ts",
+  "files": [
+    "dist/src/**/*",
+    "dist/bin/**/*"
+  ],
   "scripts": {
     "lint": "tslint --project tsconfig.json --fix",
     "build": "tsc",
@@ -24,7 +28,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/typed-code/schemats.git"
+    "url": "git+https://github.com/typed-code/schemats.git"
   },
   "bugs": {
     "url": "https://github.com/typed-code/schemats/issues"
@@ -75,5 +79,6 @@
     "transform": {
       "^.+\\.ts$": "ts-jest"
     }
-  }
+  },
+  "homepage": "https://github.com/typed-code/schemats#readme"
 }
