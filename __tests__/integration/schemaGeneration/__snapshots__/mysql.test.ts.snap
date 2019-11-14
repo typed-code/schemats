@@ -68,7 +68,6 @@ export namespace usersFields {
   export type tinytext_col = string;
   export type varbinary_col = Buffer;
   export type year_col = number;
-
 }
 
 export interface users {
@@ -131,7 +130,6 @@ export interface users {
   tinytext_col: usersFields.tinytext_col;
   varbinary_col: usersFields.varbinary_col;
   year_col: usersFields.year_col;
-
 }
 
 export namespace user_enumsFields {
@@ -139,7 +137,6 @@ export namespace user_enumsFields {
   export type nullable_enum_col = enum_nullable_enum_col | null;
   export type nullable_set_col = set_nullable_set_col | null;
   export type set_col = set_set_col;
-
 }
 
 export interface user_enums {
@@ -147,19 +144,16 @@ export interface user_enums {
   nullable_enum_col: user_enumsFields.nullable_enum_col;
   nullable_set_col: user_enumsFields.nullable_set_col;
   set_col: user_enumsFields.set_col;
-
 }
 
 export namespace packageFields {
   export type number_ = number;
   export type string_ = string;
-
 }
 
 export interface package_ {
   number: packageFields.number_;
   string: packageFields.string_;
-
 }
 "
 `;
@@ -232,7 +226,6 @@ export namespace UsersFields {
   export type tinytextCol = string;
   export type varbinaryCol = Buffer;
   export type yearCol = number;
-
 }
 
 export interface Users {
@@ -295,7 +288,6 @@ export interface Users {
   tinytextCol: UsersFields.tinytextCol;
   varbinaryCol: UsersFields.varbinaryCol;
   yearCol: UsersFields.yearCol;
-
 }
 
 export namespace UserEnumsFields {
@@ -303,7 +295,6 @@ export namespace UserEnumsFields {
   export type nullableEnumCol = EnumNullableEnumCol | null;
   export type nullableSetCol = SetNullableSetCol | null;
   export type setCol = SetSetCol;
-
 }
 
 export interface UserEnums {
@@ -311,19 +302,16 @@ export interface UserEnums {
   nullableEnumCol: UserEnumsFields.nullableEnumCol;
   nullableSetCol: UserEnumsFields.nullableSetCol;
   setCol: UserEnumsFields.setCol;
-
 }
 
 export namespace PackageFields {
   export type number_ = number;
   export type string_ = string;
-
 }
 
 export interface Package {
   number: PackageFields.number_;
   string: PackageFields.string_;
-
 }
 "
 `;

@@ -4,7 +4,7 @@
  */
 
 import * as pkgUp from 'pkg-up';
-import { Options as ITFOptions, processString } from 'typescript-formatter';
+import * as prettier from 'prettier';
 import Options, { OptionValues } from './options';
 import { Database, getDatabase } from './schema';
 import { generateEnumType, generateTableInterface, generateTableTypes } from './typescript';
@@ -111,22 +111,9 @@ export async function typescriptOfSchema(
   output += enumTypes;
   output += interfaces;
 
-  const formatterOption: ITFOptions = {
-    replace: false,
-    verify: false,
-    tsconfig: true,
-    tslint: true,
-    editorconfig: true,
-    tsfmt: true,
-    vscode: false,
-    tsconfigFile: null,
-    tslintFile: null,
-    vscodeFile: null,
-    tsfmtFile: null,
-  };
-
-  const processedResult = await processString('schema.ts', output, formatterOption);
-  return processedResult.dest;
+  const configFilePath = await prettier.resolveConfigFile();
+  const prettierOptions = await prettier.resolveConfig(configFilePath || '');
+  return prettier.format(output, { ...prettierOptions, parser: 'typescript' });
 }
 
 export { Database, getDatabase } from './schema';

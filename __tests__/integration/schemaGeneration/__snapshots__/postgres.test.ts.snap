@@ -68,7 +68,6 @@ export namespace usersFields {
   export type json_array_col = Array<Object> | null;
   export type jsonb_array_col = Array<Object> | null;
   export type timestamptz_array_col = Array<Date> | null;
-
 }
 
 export interface users {
@@ -133,7 +132,6 @@ export interface users {
   json_array_col: usersFields.json_array_col;
   jsonb_array_col: usersFields.jsonb_array_col;
   timestamptz_array_col: usersFields.timestamptz_array_col;
-
 }
 "
 `;
@@ -206,7 +204,6 @@ export namespace UsersFields {
   export type jsonArrayCol = Array<Object> | null;
   export type jsonbArrayCol = Array<Object> | null;
   export type timestamptzArrayCol = Array<Date> | null;
-
 }
 
 export interface Users {
@@ -271,7 +268,6 @@ export interface Users {
   jsonArrayCol: UsersFields.jsonArrayCol;
   jsonbArrayCol: UsersFields.jsonbArrayCol;
   timestamptzArrayCol: UsersFields.timestamptzArrayCol;
-
 }
 "
 `;

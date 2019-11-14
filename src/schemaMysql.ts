@@ -117,6 +117,7 @@ export class MysqlDatabase implements Database {
       `WHERE data_type IN ('enum', 'set') ${enumSchemaWhereClause}`,
       params
     );
+
     rawEnumRecords.forEach(
       (enumItem: { column_name: string; column_type: string; data_type: string }) => {
         const enumName = MysqlDatabase.getEnumNameFromColumn(

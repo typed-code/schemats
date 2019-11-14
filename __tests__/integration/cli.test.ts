@@ -17,6 +17,15 @@ describe('schemats cli tool integration testing', () => {
         { encoding: 'utf-8' }
       );
     });
+
+    console.log([
+      'dist/bin/schemats',
+      'generate',
+      '-c',
+      process.env.POSTGRES_URL as string,
+      '-o',
+      '/tmp/schemats_cli_postgres.ts',
+    ].join(' '));
   });
 
   condDescribe(!!process.env.MYSQL_URL, this, 'schemats generate mysql', () => {
