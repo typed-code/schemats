@@ -91,7 +91,7 @@ export class MysqlDatabase implements Database {
   }
 
   private static getEnumNameFromColumn(dataType: string, columnName: string): string {
-    return `${dataType}_${columnName}`;
+    return `${columnName}_${dataType}`;
   }
 
   public query(queryString: string) {

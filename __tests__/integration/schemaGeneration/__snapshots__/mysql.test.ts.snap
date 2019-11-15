@@ -3,10 +3,10 @@
 exports[`schema generation integration testing mysql Basic generation 1`] = `
 "/* tslint:disable */
 
-export type enum_enum_col = 'enum1' | 'enum2' | 'enum3';
-export type enum_nullable_enum_col = 'enum1' | 'enum2' | 'enum3';
-export type set_nullable_set_col = 'set1' | 'set2' | 'set3';
-export type set_set_col = 'set1' | 'set2' | 'set3';
+export type enum_col_enum = 'enum1' | 'enum2' | 'enum3';
+export type nullable_enum_col_enum = 'enum1' | 'enum2' | 'enum3';
+export type nullable_set_col_set = 'set1' | 'set2' | 'set3';
+export type set_col_set = 'set1' | 'set2' | 'set3';
 
 export namespace usersFields {
   export type bigint_col = number;
@@ -18,7 +18,7 @@ export namespace usersFields {
   export type datetime_col = Date;
   export type decimal_col = number;
   export type double_col = number;
-  export type enum_col = enum_enum_col;
+  export type enum_col = enum_col_enum;
   export type float_col = number;
   export type geometry_col = string;
   export type int_col = number;
@@ -37,7 +37,7 @@ export namespace usersFields {
   export type nullable_datetime_col = Date | null;
   export type nullable_decimal_col = number | null;
   export type nullable_double_col = number | null;
-  export type nullable_enum_col = enum_nullable_enum_col | null;
+  export type nullable_enum_col = nullable_enum_col_enum | null;
   export type nullable_float_col = number | null;
   export type nullable_geometry_col = string | null;
   export type nullable_int_col = number | null;
@@ -48,7 +48,7 @@ export namespace usersFields {
   export type nullable_mediumint_col = number | null;
   export type nullable_mediumtext_col = string | null;
   export type nullable_numeric_col = number | null;
-  export type nullable_set_col = set_nullable_set_col | null;
+  export type nullable_set_col = nullable_set_col_set | null;
   export type nullable_smallint_col = number | null;
   export type nullable_text_col = string | null;
   export type nullable_time_col = string | null;
@@ -58,7 +58,7 @@ export namespace usersFields {
   export type nullable_varbinary_col = Buffer | null;
   export type nullable_year_col = number | null;
   export type numeric_col = number;
-  export type set_col = set_set_col;
+  export type set_col = set_col_set;
   export type smallint_col = number;
   export type text_col = string;
   export type time_col = string;
@@ -133,10 +133,10 @@ export interface users {
 }
 
 export namespace user_enumsFields {
-  export type enum_col = enum_enum_col;
-  export type nullable_enum_col = enum_nullable_enum_col | null;
-  export type nullable_set_col = set_nullable_set_col | null;
-  export type set_col = set_set_col;
+  export type enum_col = enum_col_enum;
+  export type nullable_enum_col = nullable_enum_col_enum | null;
+  export type nullable_set_col = nullable_set_col_set | null;
+  export type set_col = set_col_set;
 }
 
 export interface user_enums {
@@ -161,10 +161,10 @@ export interface package_ {
 exports[`schema generation integration testing mysql Camelcase generation 1`] = `
 "/* tslint:disable */
 
-export type EnumEnumCol = 'enum1' | 'enum2' | 'enum3';
-export type EnumNullableEnumCol = 'enum1' | 'enum2' | 'enum3';
-export type SetNullableSetCol = 'set1' | 'set2' | 'set3';
-export type SetSetCol = 'set1' | 'set2' | 'set3';
+export type EnumColEnum = 'enum1' | 'enum2' | 'enum3';
+export type NullableEnumColEnum = 'enum1' | 'enum2' | 'enum3';
+export type NullableSetColSet = 'set1' | 'set2' | 'set3';
+export type SetColSet = 'set1' | 'set2' | 'set3';
 
 export namespace UsersFields {
   export type bigintCol = number;
@@ -176,7 +176,7 @@ export namespace UsersFields {
   export type datetimeCol = Date;
   export type decimalCol = number;
   export type doubleCol = number;
-  export type enumCol = EnumEnumCol;
+  export type enumCol = EnumColEnum;
   export type floatCol = number;
   export type geometryCol = string;
   export type intCol = number;
@@ -195,7 +195,7 @@ export namespace UsersFields {
   export type nullableDatetimeCol = Date | null;
   export type nullableDecimalCol = number | null;
   export type nullableDoubleCol = number | null;
-  export type nullableEnumCol = EnumNullableEnumCol | null;
+  export type nullableEnumCol = NullableEnumColEnum | null;
   export type nullableFloatCol = number | null;
   export type nullableGeometryCol = string | null;
   export type nullableIntCol = number | null;
@@ -206,7 +206,7 @@ export namespace UsersFields {
   export type nullableMediumintCol = number | null;
   export type nullableMediumtextCol = string | null;
   export type nullableNumericCol = number | null;
-  export type nullableSetCol = SetNullableSetCol | null;
+  export type nullableSetCol = NullableSetColSet | null;
   export type nullableSmallintCol = number | null;
   export type nullableTextCol = string | null;
   export type nullableTimeCol = string | null;
@@ -216,7 +216,7 @@ export namespace UsersFields {
   export type nullableVarbinaryCol = Buffer | null;
   export type nullableYearCol = number | null;
   export type numericCol = number;
-  export type setCol = SetSetCol;
+  export type setCol = SetColSet;
   export type smallintCol = number;
   export type textCol = string;
   export type timeCol = string;
@@ -291,10 +291,10 @@ export interface Users {
 }
 
 export namespace UserEnumsFields {
-  export type enumCol = EnumEnumCol;
-  export type nullableEnumCol = EnumNullableEnumCol | null;
-  export type nullableSetCol = SetNullableSetCol | null;
-  export type setCol = SetSetCol;
+  export type enumCol = EnumColEnum;
+  export type nullableEnumCol = NullableEnumColEnum | null;
+  export type nullableSetCol = NullableSetColSet | null;
+  export type setCol = SetColSet;
 }
 
 export interface UserEnums {

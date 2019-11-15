@@ -19,8 +19,8 @@ describe('Type generation for MySQL', () => {
     expect(res).toContain('interface users');
     expect(res).toContain('namespace productsFields');
     expect(res).toContain('interface products');
-    expect(res).toContain('enum_rank');
-    expect(res).toContain('enum_type');
+    expect(res).toContain('rank_enum');
+    expect(res).toContain('type_enum');
   });
 
   it('should generate fields & interface for a specific table', async () => {
@@ -31,6 +31,6 @@ describe('Type generation for MySQL', () => {
 
     expect(res).toContain('namespace usersFields');
     expect(res).toContain('interface users');
-    expect(res).not.toContain('enum_type');
+    expect(res).not.toContain('type_enum');
   });
 });

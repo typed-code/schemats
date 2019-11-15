@@ -105,8 +105,8 @@ describe('MysqlDatabase', () => {
 
       const enumTypes = await mysqlProxy.getEnumTypes('testschema');
       expect(enumTypes).toEqual({
-        enum_column1: ['enum1'],
-        set_column2: ['set1'],
+        column1_enum: ['enum1'],
+        column2_set: ['set1'],
       });
     });
 
@@ -118,7 +118,7 @@ describe('MysqlDatabase', () => {
 
       const enumTypes = await mysqlProxy.getEnumTypes('testschema');
       expect(enumTypes).toEqual({
-        enum_column1: ['enum1', 'enum2'],
+        column1_enum: ['enum1', 'enum2'],
       });
     });
 
@@ -162,8 +162,8 @@ describe('MysqlDatabase', () => {
       const schemaTables = await mysqlProxy.getTableDefinition('testtable', 'testschema');
       expect(schemaTables).toEqual({
         column1: { udtName: 'data1', nullable: false },
-        column2: { udtName: 'enum_column2', nullable: true },
-        column3: { udtName: 'set_column3', nullable: true },
+        column2: { udtName: 'column2_enum', nullable: true },
+        column3: { udtName: 'column3_set', nullable: true },
       });
     });
   });
