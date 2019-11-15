@@ -1,0 +1,66 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Typescript generateTableInterface empty table definition object 1`] = `
+"
+        export interface tableName {
+        
+        }
+    "
+`;
+
+exports[`Typescript generateTableInterface table name is reserved 1`] = `
+"
+        export interface package_ {
+        
+        }
+    "
+`;
+
+exports[`Typescript generateTableInterface table with columns 1`] = `
+"
+        export interface tableName {
+        col1: tableNameFields.col1;
+col2: tableNameFields.col2;
+
+        }
+    "
+`;
+
+exports[`Typescript generateTableInterface table with reserved columns 1`] = `
+"
+        export interface tableName {
+        string: tableNameFields.string_;
+number: tableNameFields.number_;
+package: tableNameFields.package_;
+
+        }
+    "
+`;
+
+exports[`Typescript generateTableTypes empty table definition object 1`] = `
+"
+        export namespace tableNameFields {
+        
+        }
+    "
+`;
+
+exports[`Typescript generateTableTypes with nullable column definitions 1`] = `
+"
+        export namespace tableNameFields {
+        export type col1 = string| null;
+export type col2 = number| null;
+
+        }
+    "
+`;
+
+exports[`Typescript generateTableTypes with table definitions 1`] = `
+"
+        export namespace tableNameFields {
+        export type col1 = string;
+export type col2 = number;
+
+        }
+    "
+`;

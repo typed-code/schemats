@@ -1,4 +1,3 @@
-import * as assert from 'assert';
 import Options from '../../src/options';
 import * as Typescript from '../../src/typescript';
 
@@ -8,26 +7,14 @@ describe('Typescript', () => {
   describe('generateTableInterface', () => {
     it('empty table definition object', () => {
       const tableInterface = Typescript.generateTableInterface('tableName', {}, options);
-      assert.strictEqual(
-        tableInterface,
-        '\n' +
-        '        export interface tableName {\n' +
-        '        \n' +
-        '        }\n' +
-        '    '
-      );
+      expect(tableInterface).toMatchSnapshot();
     });
+
     it('table name is reserved', () => {
       const tableInterface = Typescript.generateTableInterface('package', {}, options);
-      assert.strictEqual(
-        tableInterface,
-        '\n' +
-        '        export interface package_ {\n' +
-        '        \n' +
-        '        }\n' +
-        '    '
-      );
+      expect(tableInterface).toMatchSnapshot();
     });
+
     it('table with columns', () => {
       const tableInterface = Typescript.generateTableInterface(
         'tableName',
@@ -37,17 +24,9 @@ describe('Typescript', () => {
         },
         options
       );
-      assert.strictEqual(
-        tableInterface,
-        '\n' +
-        '        export interface tableName {\n' +
-        '        col1: tableNameFields.col1;\n' +
-        'col2: tableNameFields.col2;\n' +
-        '\n' +
-        '        }\n' +
-        '    '
-      );
+      expect(tableInterface).toMatchSnapshot();
     });
+
     it('table with reserved columns', () => {
       const tableInterface = Typescript.generateTableInterface(
         'tableName',
@@ -58,24 +37,16 @@ describe('Typescript', () => {
         },
         options
       );
-      assert.strictEqual(
-        tableInterface,
-        '\n' +
-        '        export interface tableName {\n' +
-        '        string: tableNameFields.string_;\n' +
-        'number: tableNameFields.number_;\n' +
-        'package: tableNameFields.package_;\n' +
-        '\n' +
-        '        }\n' +
-        '    '
-      );
+      expect(tableInterface).toMatchSnapshot();
     });
   });
+
   describe('generateEnumType', () => {
     it('empty object', () => {
       const enumType = Typescript.generateEnumType({}, options);
-      assert.strictEqual(enumType, '');
+      expect(enumType).toBe('');
     });
+
     it('with enumerations', () => {
       const enumType = Typescript.generateEnumType(
         {
@@ -84,18 +55,19 @@ describe('Typescript', () => {
         },
         options
       );
-      assert.strictEqual(
-        enumType,
-        'export type enum1 = \'val1\' | \'val2\' | \'val3\' | \'val4\';\n' +
-        'export type enum2 = \'val5\' | \'val6\' | \'val7\' | \'val8\';\n'
+      expect(enumType).toBe(
+        `export type enum1 = 'val1' | 'val2' | 'val3' | 'val4';\n` +
+          `export type enum2 = 'val5' | 'val6' | 'val7' | 'val8';\n`
       );
     });
   });
+
   describe('generateEnumType', () => {
     it('empty object', () => {
       const enumType = Typescript.generateEnumType({}, options);
-      assert.strictEqual(enumType, '');
+      expect(enumType).toBe('');
     });
+
     it('with enumerations', () => {
       const enumType = Typescript.generateEnumType(
         {
@@ -104,26 +76,19 @@ describe('Typescript', () => {
         },
         options
       );
-      assert.strictEqual(
-        enumType,
-        'export type enum1 = \'val1\' | \'val2\' | \'val3\' | \'val4\';\n' +
-        'export type enum2 = \'val5\' | \'val6\' | \'val7\' | \'val8\';\n'
+
+      expect(enumType).toBe(
+        `export type enum1 = 'val1' | 'val2' | 'val3' | 'val4';\n` +
+          `export type enum2 = 'val5' | 'val6' | 'val7' | 'val8';\n`
       );
     });
   });
   describe('generateTableTypes', () => {
     it('empty table definition object', () => {
       const tableTypes = Typescript.generateTableTypes('tableName', {}, options);
-      assert.strictEqual(
-        tableTypes,
-        '\n' +
-        '        export namespace tableNameFields {' +
-        '\n        ' +
-        '\n        ' +
-        '}' +
-        '\n    '
-      );
+      expect(tableTypes).toMatchSnapshot();
     });
+
     it('with table definitions', () => {
       const tableTypes = Typescript.generateTableTypes(
         'tableName',
@@ -133,17 +98,9 @@ describe('Typescript', () => {
         },
         options
       );
-      assert.strictEqual(
-        tableTypes,
-        '\n' +
-        '        export namespace tableNameFields {' +
-        '\n        export type col1 = string;' +
-        '\nexport type col2 = number;' +
-        '\n' +
-        '\n        }' +
-        '\n    '
-      );
+      expect(tableTypes).toMatchSnapshot();
     });
+
     it('with nullable column definitions', () => {
       const tableTypes = Typescript.generateTableTypes(
         'tableName',
@@ -153,16 +110,8 @@ describe('Typescript', () => {
         },
         options
       );
-      assert.strictEqual(
-        tableTypes,
-        '\n' +
-        '        export namespace tableNameFields {' +
-        '\n        export type col1 = string| null;' +
-        '\nexport type col2 = number| null;' +
-        '\n' +
-        '\n        }' +
-        '\n    '
-      );
+
+      expect(tableTypes).toMatchSnapshot();
     });
   });
 });
