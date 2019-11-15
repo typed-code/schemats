@@ -60,7 +60,7 @@ function buildHeader(
     `;
 }
 
-export async function typescriptOfTable(
+async function typescriptOfTable(
   db: Database | string,
   table: string,
   schema: string,

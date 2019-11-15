@@ -163,8 +163,9 @@ export class MysqlDatabase implements Database {
   }
 
   public async getTableTypes(tableName: string, tableSchema: string, options: Options) {
-    const enumTypes: any = await this.getEnumTypes(tableSchema);
+    const enumTypes = await this.getEnumTypes(tableSchema);
     const customTypes = keys(enumTypes);
+
     return MysqlDatabase.mapTableDefinitionToType(
       await this.getTableDefinition(tableName, tableSchema),
       customTypes,

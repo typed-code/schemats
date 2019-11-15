@@ -14,11 +14,7 @@ function nameIsReservedKeyword(name: string): boolean {
 }
 
 function normalizeName(name: string, options: Options): string {
-  if (nameIsReservedKeyword(name)) {
-    return name + '_';
-  } else {
-    return name;
-  }
+  return nameIsReservedKeyword(name) ? name + '_' : name;
 }
 
 export function generateTableInterface(
@@ -27,31 +23,34 @@ export function generateTableInterface(
   options: Options
 ) {
   const tableName = options.transformTypeName(tableNameRaw);
-  let members = '';
-  Object.keys(tableDefinition)
+
+  const members = Object.keys(tableDefinition)
     .map(c => options.transformColumnName(c))
-    .forEach(columnName => {
-      members += `${columnName}: ${tableName}Fields.${normalizeName(columnName, options)};\n`;
-    });
+    .reduce((result, columnName) => {
+      result.push(`${columnName}: ${tableName}Fields.${normalizeName(columnName, options)};`);
+
+      return result;
+    }, [] as string[]);
 
   return `
-        export interface ${normalizeName(tableName, options)} {
-        ${members}
-        }
-    `;
+  export interface ${normalizeName(tableName, options)} {
+    ${members.join('\n    ')}
+  }
+`;
 }
 
 export function generateEnumType(enumObject: { [key: string]: string[] }, options: Options) {
-  let enumString = '';
-  for (const enumNameRaw in enumObject) {
-    if (enumObject.hasOwnProperty(enumNameRaw)) {
-      const enumName = options.transformTypeName(enumNameRaw);
-      enumString += `export type ${enumName} = `;
-      enumString += enumObject[enumNameRaw].map((v: string) => `'${v}'`).join(' | ');
-      enumString += ';\n';
-    }
-  }
-  return enumString;
+  const enums = Object.entries(enumObject);
+  return (
+    enums
+      .reduce((result, [enumNameRaw, values]) => {
+        const enumName = options.transformTypeName(enumNameRaw);
+        result.push(`export type ${enumName} = ${values.map(v => `'${v}'`).join(' | ')};`);
+
+        return result;
+      }, [] as string[])
+      .join('\n') + (enums.length ? '\n' : '')
+  );
 }
 
 export function generateTableTypes(
@@ -60,17 +59,18 @@ export function generateTableTypes(
   options: Options
 ) {
   const tableName = options.transformTypeName(tableNameRaw);
-  let fields = '';
-  Object.keys(tableDefinition).forEach(columnNameRaw => {
-    const type = tableDefinition[columnNameRaw].tsType;
-    const nullable = tableDefinition[columnNameRaw].nullable ? '| null' : '';
+
+  const fields = Object.entries(tableDefinition).reduce((result, [columnNameRaw, definition]) => {
+    const type = definition.tsType;
+    const nullable = definition.nullable ? ' | null' : '';
     const columnName = options.transformColumnName(columnNameRaw);
-    fields += `export type ${normalizeName(columnName, options)} = ${type}${nullable};\n`;
-  });
+    result.push(`export type ${normalizeName(columnName, options)} = ${type}${nullable};`);
+    return result;
+  }, [] as string[]);
 
   return `
-        export namespace ${tableName}Fields {
-        ${fields}
-        }
-    `;
+  export namespace ${tableName}Fields {
+    ${fields.join('\n    ')}
+  }
+`;
 }
