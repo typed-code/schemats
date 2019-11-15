@@ -14,11 +14,23 @@ describe('Type generation for MySQL', () => {
     driver.given.table(schema, aUsersTable).given.table(schema, aProductsTable);
 
     const res = await typescriptOfSchema('mysql://', undefined, schema);
+
     expect(res).toContain('namespace usersFields');
     expect(res).toContain('interface users');
     expect(res).toContain('namespace productsFields');
     expect(res).toContain('interface products');
     expect(res).toContain('enum_rank');
     expect(res).toContain('enum_type');
+  });
+
+  it('should generate fields & interface for a specific table', async () => {
+    const schema = 'schemaName';
+    driver.given.table(schema, aUsersTable).given.table(schema, aProductsTable);
+
+    const res = await typescriptOfSchema('mysql://', ['users'], schema);
+
+    expect(res).toContain('namespace usersFields');
+    expect(res).toContain('interface users');
+    expect(res).not.toContain('enum_type');
   });
 });

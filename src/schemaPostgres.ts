@@ -102,7 +102,7 @@ export class PostgresDatabase implements Database {
     return this.db.query(queryString);
   }
 
-  public async getEnumTypes(schema?: string): Promise<{ [key: string]: string[] }> {
+  public async getEnumTypes(schema?: string, tables: string[] = []): Promise<{ [key: string]: string[] }> {
     interface T {
       name: string;
       value: any;

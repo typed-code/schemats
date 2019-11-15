@@ -98,18 +98,26 @@ export class MysqlDatabase implements Database {
     return this.queryAsync(queryString);
   }
 
-  public async getEnumTypes(schema?: string): Promise<{ [key: string]: string[] }> {
-    let enumSchemaWhereClause: string = '';
+  public async getEnumTypes(
+    schema?: string,
+    tables: string[] = []
+  ): Promise<{ [key: string]: string[] }> {
+    let additionWhereClause: string = '';
     const params: string[] = [];
     if (schema) {
-      enumSchemaWhereClause = `and table_schema = ? `;
+      additionWhereClause = `and table_schema = ? `;
       params.push(schema);
+    }
+
+    if (tables.length > 0) {
+      additionWhereClause = `and table_name in (${tables.map(_ => '?').join(',')}) `;
+      params.push(...tables);
     }
 
     const rawEnumRecords = await this.queryAsync(
       'SELECT column_name, column_type, data_type ' +
         'FROM information_schema.columns ' +
-        `WHERE data_type IN ('enum', 'set') ${enumSchemaWhereClause}ORDER BY column_name`,
+        `WHERE data_type IN ('enum', 'set') ${additionWhereClause}ORDER BY column_name`,
       params
     );
 

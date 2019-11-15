@@ -17,7 +17,7 @@ export interface Database {
 
   getDefaultSchema(): string;
 
-  getEnumTypes(schema?: string): Promise<{ [key: string]: string[] }>;
+  getEnumTypes(schema?: string, tables?: string[]): Promise<{ [key: string]: string[] }>;
 
   getTableDefinition(tableName: string, tableSchema: string): Promise<TableDefinition>;
 

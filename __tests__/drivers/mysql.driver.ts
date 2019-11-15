@@ -20,7 +20,7 @@ export class MysqlDriver {
 
   private handleQuery(query: string, params: any[], cb: (error: any, results?: any[]) => void) {
     if (query.includes(`WHERE data_type IN ('enum', 'set')`)) {
-      cb(null, this.getAllEnums(params[0]));
+      cb(null, this.getAllEnums(params));
     } else if (query.includes(`WHERE table_name = ? and table_schema = ?`)) {
       cb(null, this.getTableColumns(params[0], params[1]));
     } else if (query.includes('SELECT table_name')) {
@@ -30,10 +30,11 @@ export class MysqlDriver {
     }
   }
 
-  private getAllEnums(schemaName?: string): IColumn[] {
+  private getAllEnums([schemaName, ...tableNames]: string[]): IColumn[] {
     return Object.entries(this.schemas)
       .filter(([schemaKey]) => (schemaName && schemaKey === schemaName) || !schemaName)
       .reduce((tables, [x, schema]) => tables.concat(Object.values(schema)), [] as ITable[])
+      .filter(table => tableNames.length === 0 || tableNames.includes(table.name))
       .reduce(
         (rows, table) =>
           rows.concat(table.columns.filter(c => c.data_type === 'enum' || c.data_type === 'set')),

@@ -98,7 +98,7 @@ export async function typescriptOfSchema(
 
   const optionsObject = new Options(options);
 
-  const enumTypes = generateEnumType(await db.getEnumTypes(schema), optionsObject);
+  const enumTypes = generateEnumType(await db.getEnumTypes(schema, tables), optionsObject);
   const interfacePromises = tables.map(table =>
     typescriptOfTable(db, table, schema as string, optionsObject)
   );
