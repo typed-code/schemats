@@ -77,7 +77,7 @@ export class MysqlDatabase implements Database {
           } else {
             // tslint:disable-next-line
             console.log(
-              `Type [${column.udtName}] has been mapped to [any] because no specific type has been found.`
+              `Type '${column.udtName}' has been mapped to 'any' because no specific type has been found.`
             );
             column.tsType = 'any';
             return column;
