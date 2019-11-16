@@ -6,7 +6,7 @@
 import * as _ from 'lodash';
 
 import { Options } from './options';
-import { TableDefinition } from './schemaInterfaces';
+import { ITable } from './schemaInterfaces';
 
 function nameIsReservedKeyword(name: string): boolean {
   const reservedKeywords = ['string', 'number', 'package'];
@@ -17,14 +17,10 @@ function normalizeName(name: string, options: Options): string {
   return nameIsReservedKeyword(name) ? name + '_' : name;
 }
 
-export function generateTableInterface(
-  tableNameRaw: string,
-  tableDefinition: TableDefinition,
-  options: Options
-) {
-  const tableName = options.transformTypeName(tableNameRaw);
+export function generateTableInterface(tableDefinition: ITable, options: Options) {
+  const tableName = options.transformTypeName(tableDefinition.name);
 
-  const members = Object.keys(tableDefinition)
+  const members = Object.keys(tableDefinition.columns)
     .map(c => options.transformColumnName(c))
     .reduce((result, columnName) => {
       result.push(`${columnName}: ${tableName}Fields.${normalizeName(columnName, options)};`);
@@ -53,20 +49,19 @@ export function generateEnumType(enumObject: { [key: string]: string[] }, option
   );
 }
 
-export function generateTableTypes(
-  tableNameRaw: string,
-  tableDefinition: TableDefinition,
-  options: Options
-) {
-  const tableName = options.transformTypeName(tableNameRaw);
+export function generateTableTypes(tableDefinition: ITable, options: Options) {
+  const tableName = options.transformTypeName(tableDefinition.name);
 
-  const fields = Object.entries(tableDefinition).reduce((result, [columnNameRaw, definition]) => {
-    const type = definition.tsType;
-    const nullable = definition.nullable ? ' | null' : '';
-    const columnName = options.transformColumnName(columnNameRaw);
-    result.push(`export type ${normalizeName(columnName, options)} = ${type}${nullable};`);
-    return result;
-  }, [] as string[]);
+  const fields = Object.entries(tableDefinition.columns).reduce(
+    (result, [columnNameRaw, definition]) => {
+      const type = definition.tsType;
+      const nullable = definition.nullable ? ' | null' : '';
+      const columnName = options.transformColumnName(columnNameRaw);
+      result.push(`export type ${normalizeName(columnName, options)} = ${type}${nullable};`);
+      return result;
+    },
+    [] as string[]
+  );
 
   return `
   export namespace ${tableName}Fields {

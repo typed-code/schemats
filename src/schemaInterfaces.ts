@@ -10,6 +10,11 @@ export interface TableDefinition {
   [columnName: string]: ColumnDefinition;
 }
 
+export interface ITable {
+  name: string;
+  columns: TableDefinition;
+}
+
 export interface Database {
   connectionString: string;
 
@@ -19,9 +24,9 @@ export interface Database {
 
   getEnumTypes(schema?: string, tables?: string[]): Promise<{ [key: string]: string[] }>;
 
-  getTableDefinition(tableName: string, tableSchema: string): Promise<TableDefinition>;
+  getTablesDefinition(tableNames: string[], tableSchema: string): Promise<ITable[]>;
 
-  getTableTypes(tableName: string, tableSchema: string, options: Options): Promise<TableDefinition>;
+  getTablesTypes(tableName: string[], tableSchema: string, options: Options): Promise<ITable[]>;
 
   getSchemaTables(schemaName: string): Promise<string[]>;
 }

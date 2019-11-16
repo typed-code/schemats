@@ -12,6 +12,14 @@ let isStubEnabled = true;
 function pgpStubFactory(shouldReturnMockHandler = false) {
   if (shouldReturnMockHandler) {
     return {
+      withStubEachResults: (results: any[]) => {
+        pgpStub.each.mockImplementation((query, params, cb) => {
+          return new Promise(resolve => {
+            results.forEach(cb);
+            resolve();
+          });
+        });
+      },
       pgpStub,
       resetMocks: () => {
         pgpStub.query.mockReset();
@@ -20,7 +28,7 @@ function pgpStubFactory(shouldReturnMockHandler = false) {
       },
     };
   }
-  const dbConnection = (conn: string) => isStubEnabled ? pgpStub : pgp(conn);
+  const dbConnection = (conn: string) => (isStubEnabled ? pgpStub : pgp(conn));
 
   dbConnection.as = pgp.as;
   return dbConnection;

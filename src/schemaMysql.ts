@@ -2,7 +2,7 @@ import { isEqual, keys, mapValues } from 'lodash';
 import { Connection, createConnection, MysqlError } from 'mysql';
 import { parse as urlParse } from 'url';
 import { Options } from './options';
-import { Database, TableDefinition } from './schemaInterfaces';
+import { Database, ITable } from './schemaInterfaces';
 
 export class MysqlDatabase implements Database {
   private db: Connection;
@@ -16,14 +16,15 @@ export class MysqlDatabase implements Database {
 
   // uses the type mappings from https://github.com/mysqljs/ where sensible
   private static mapTableDefinitionToType(
-    tableDefinition: TableDefinition,
+    tableDefinition: ITable,
     customTypes: string[],
     options: Options
-  ): TableDefinition {
+  ): ITable {
     if (!options) {
       throw new Error('No options given');
     }
-    return mapValues(tableDefinition, column => {
+
+    tableDefinition.columns = mapValues(tableDefinition.columns, column => {
       switch (column.udtName) {
         case 'char':
         case 'varchar':
@@ -84,6 +85,8 @@ export class MysqlDatabase implements Database {
           }
       }
     });
+
+    return tableDefinition;
   }
 
   private static parseMysqlEnumeration(mysqlEnum: string): string[] {
@@ -150,42 +153,58 @@ export class MysqlDatabase implements Database {
     }, {} as any);
   }
 
-  public async getTableDefinition(
-    tableName: string,
-    tableSchema: string
-  ): Promise<TableDefinition> {
+  public async getTablesDefinition(tableNames: string[], tableSchema: string): Promise<ITable[]> {
     const tableColumns = await this.queryAsync<{
+      table_name: string;
       column_name: string;
       data_type: string;
       is_nullable: 'YES' | 'NO';
     }>(
-      'SELECT column_name, data_type, is_nullable ' +
+      'SELECT table_name, column_name, data_type, is_nullable ' +
         'FROM information_schema.columns ' +
-        'WHERE table_name = ? and table_schema = ? ORDER BY column_name',
-      [tableName, tableSchema]
+        'WHERE table_schema = ? and ' +
+        `table_name IN (${tableNames.map(_ => '?').join(',')}) ` +
+        'ORDER BY table_name, column_name',
+      [tableSchema, ...tableNames]
     );
 
-    return tableColumns.reduce((result, { column_name, data_type, is_nullable }) => {
-      result[column_name] = {
-        udtName: /^(enum|set)$/i.test(data_type)
-          ? MysqlDatabase.getEnumNameFromColumn(data_type, column_name)
-          : data_type,
-        nullable: is_nullable === 'YES',
-        tsType: '',
-      };
+    const tablesMap = tableColumns.reduce(
+      (result, { table_name, column_name, data_type, is_nullable }) => {
+        result[table_name] = result[table_name] || {
+          name: table_name,
+          columns: {},
+        };
 
-      return result;
-    }, ({} as unknown) as TableDefinition);
+        const table = result[table_name];
+
+        table.columns[column_name] = {
+          udtName: /^(enum|set)$/i.test(data_type)
+            ? MysqlDatabase.getEnumNameFromColumn(data_type, column_name)
+            : data_type,
+          nullable: is_nullable === 'YES',
+          tsType: '',
+        };
+
+        return result;
+      },
+      ({} as unknown) as { [tableName: string]: ITable }
+    );
+
+    return Object.values(tablesMap);
   }
 
-  public async getTableTypes(tableName: string, tableSchema: string, options: Options) {
+  public async getTablesTypes(
+    tableNames: string[],
+    tableSchema: string,
+    options: Options
+  ): Promise<ITable[]> {
     const enumTypes = await this.getEnumTypes(tableSchema);
     const customTypes = keys(enumTypes);
 
-    return MysqlDatabase.mapTableDefinitionToType(
-      await this.getTableDefinition(tableName, tableSchema),
-      customTypes,
-      options
+    const tableDefinitions = await this.getTablesDefinition(tableNames, tableSchema);
+
+    return tableDefinitions.map(table =>
+      MysqlDatabase.mapTableDefinitionToType(table, customTypes, options)
     );
   }
 
@@ -200,7 +219,11 @@ export class MysqlDatabase implements Database {
     return schemaTables.map(({ table_name }) => table_name);
   }
 
-  public queryAsync<T = object>(queryString: string, escapedValues?: string[]): Promise<T[]> {
+  public getDefaultSchema(): string {
+    return this.defaultSchema;
+  }
+
+  private queryAsync<T = object>(queryString: string, escapedValues?: string[]): Promise<T[]> {
     return new Promise((resolve, reject) => {
       this.db.query(queryString, escapedValues, (error: MysqlError, results: T[]) => {
         if (error) {
@@ -209,10 +232,6 @@ export class MysqlDatabase implements Database {
         return resolve(this.toLowerCaseColumnName<T>(results));
       });
     });
-  }
-
-  public getDefaultSchema(): string {
-    return this.defaultSchema;
   }
 
   private toLowerCaseColumnName<T>(results: T[]): T[] {

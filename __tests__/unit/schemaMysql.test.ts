@@ -1,6 +1,6 @@
 import * as mysql from 'mysql';
 import { Options } from '../../src/options';
-import { TableDefinition } from '../../src/schemaInterfaces';
+import { ITable } from '../../src/schemaInterfaces';
 import { MysqlDatabase } from '../../src/schemaMysql';
 
 const options = new Options({});
@@ -138,41 +138,46 @@ describe('MysqlDatabase', () => {
     });
   });
 
-  describe('getTableDefinitions', () => {
+  describe('getTablesDefinitions', () => {
     it('writes correct query', async () => {
       db.mysqlStub.withResults([]);
 
-      await mysqlProxy.getTableDefinition('testtable', 'testschema');
+      await mysqlProxy.getTablesDefinition(['testtable'], 'testschema');
       expect(db.mysqlStub.query).toHaveBeenCalledWith(
-        'SELECT column_name, data_type, is_nullable ' +
+        'SELECT table_name, column_name, data_type, is_nullable ' +
           'FROM information_schema.columns ' +
-          'WHERE table_name = ? and table_schema = ? ORDER BY column_name',
-        ['testtable', 'testschema'],
+          'WHERE table_schema = ? and table_name IN (?) ORDER BY table_name, column_name',
+        ['testschema', 'testtable'],
         expect.any(Function)
       );
     });
 
     it('handles response', async () => {
       db.mysqlStub.withResults([
-        { column_name: 'column1', data_type: 'data1', is_nullable: 'NO' },
-        { column_name: 'column2', data_type: 'enum', is_nullable: 'YES' },
-        { column_name: 'column3', data_type: 'set', is_nullable: 'YES' },
+        { table_name: 'testtable', column_name: 'column1', data_type: 'data1', is_nullable: 'NO' },
+        { table_name: 'testtable', column_name: 'column2', data_type: 'enum', is_nullable: 'YES' },
+        { table_name: 'testtable', column_name: 'column3', data_type: 'set', is_nullable: 'YES' },
       ]);
 
-      const schemaTables = await mysqlProxy.getTableDefinition('testtable', 'testschema');
-      expect(schemaTables).toEqual({
-        column1: { udtName: 'data1', nullable: false, tsType: '' },
-        column2: { udtName: 'column2_enum', nullable: true, tsType: '' },
-        column3: { udtName: 'column3_set', nullable: true, tsType: '' },
-      });
+      const schemaTables = await mysqlProxy.getTablesDefinition(['testtable'], 'testschema');
+      expect(schemaTables).toEqual([
+        {
+          name: 'testtable',
+          columns: {
+            column1: { udtName: 'data1', nullable: false, tsType: '' },
+            column2: { udtName: 'column2_enum', nullable: true, tsType: '' },
+            column3: { udtName: 'column3_set', nullable: true, tsType: '' },
+          },
+        },
+      ]);
     });
   });
 
-  describe('getTableTypes', () => {
+  describe('getTablesTypes', () => {
     beforeEach(() => {
       spies = {
         getEnumTypes: jest.spyOn(MysqlDatabase.prototype, 'getEnumTypes'),
-        getTableDefinition: jest.spyOn(MysqlDatabase.prototype, 'getTableDefinition'),
+        getTablesDefinition: jest.spyOn(MysqlDatabase.prototype, 'getTablesDefinition'),
         mapTableDefinitionToType: jest.spyOn(MysqlDBReflection, 'mapTableDefinitionToType'),
       };
     });
@@ -188,11 +193,11 @@ describe('MysqlDatabase', () => {
           enum2: [],
         })
       );
-      (MysqlDatabase as any).prototype.getTableDefinition.mockReturnValue(Promise.resolve({}));
+      (MysqlDatabase as any).prototype.getTablesDefinition.mockReturnValue(Promise.resolve([{}]));
 
-      await mysqlProxy.getTableTypes('tableName', 'tableSchema', options);
+      await mysqlProxy.getTablesTypes(['tableName'], 'tableSchema', options);
       expect(MysqlDBReflection.mapTableDefinitionToType).toHaveBeenCalledWith(
-        {},
+        { columns: {} },
         ['enum1', 'enum2'],
         expect.any(Object)
       );
@@ -200,25 +205,33 @@ describe('MysqlDatabase', () => {
 
     it('gets table definitions', async () => {
       (MysqlDatabase as any).prototype.getEnumTypes.mockReturnValue(Promise.resolve({}));
-      (MysqlDatabase as any).prototype.getTableDefinition.mockReturnValue(
-        Promise.resolve({
-          table: {
-            udtName: 'name',
-            nullable: false,
+      (MysqlDatabase as any).prototype.getTablesDefinition.mockReturnValue(
+        Promise.resolve([
+          {
+            name: 'tableName',
+            columns: {
+              table: {
+                udtName: 'name',
+                nullable: false,
+              },
+            },
           },
-        })
+        ])
       );
-      await mysqlProxy.getTableTypes('tableName', 'tableSchema', options);
-      expect(MysqlDBReflection.prototype.getTableDefinition).toHaveBeenCalledWith(
-        'tableName',
+      await mysqlProxy.getTablesTypes(['tableName'], 'tableSchema', options);
+      expect(MysqlDBReflection.prototype.getTablesDefinition).toHaveBeenCalledWith(
+        ['tableName'],
         'tableSchema'
       );
       expect(MysqlDBReflection.mapTableDefinitionToType).toHaveBeenCalledWith(
         {
-          table: {
-            udtName: 'name',
-            nullable: false,
-            tsType: 'any',
+          name: 'tableName',
+          columns: {
+            table: {
+              udtName: 'name',
+              nullable: false,
+              tsType: 'any',
+            },
           },
         },
         [],
@@ -265,16 +278,19 @@ describe('MysqlDatabase', () => {
         'enum',
       ].forEach(type =>
         it(type, () => {
-          const td: TableDefinition = {
-            column: {
-              udtName: type,
-              nullable: false,
-              tsType: '',
+          const td: ITable = {
+            name: 'tableName',
+            columns: {
+              column: {
+                udtName: type,
+                nullable: false,
+                tsType: '',
+              },
             },
           };
-          expect(MysqlDBReflection.mapTableDefinitionToType(td, [], options).column.tsType).toEqual(
-            'string'
-          );
+          expect(
+            MysqlDBReflection.mapTableDefinitionToType(td, [], options).columns.column.tsType
+          ).toEqual('string');
         })
       );
     });
@@ -293,61 +309,73 @@ describe('MysqlDatabase', () => {
         'year',
       ].forEach(type =>
         it(type, () => {
-          const td: TableDefinition = {
-            column: {
-              udtName: type,
-              nullable: false,
-              tsType: '',
+          const td: ITable = {
+            name: 'tableName',
+            columns: {
+              column: {
+                udtName: type,
+                nullable: false,
+                tsType: '',
+              },
             },
           };
-          expect(MysqlDBReflection.mapTableDefinitionToType(td, [], options).column.tsType).toEqual(
-            'number'
-          );
+          expect(
+            MysqlDBReflection.mapTableDefinitionToType(td, [], options).columns.column.tsType
+          ).toEqual('number');
         })
       );
     });
 
     describe('maps to boolean', () => {
       it('tinyint', () => {
-        const td: TableDefinition = {
-          column: {
-            udtName: 'tinyint',
-            nullable: false,
-            tsType: '',
+        const td: ITable = {
+          name: 'tableName',
+          columns: {
+            column: {
+              udtName: 'tinyint',
+              nullable: false,
+              tsType: '',
+            },
           },
         };
-        expect(MysqlDBReflection.mapTableDefinitionToType(td, [], options).column.tsType).toEqual(
-          'boolean'
-        );
+        expect(
+          MysqlDBReflection.mapTableDefinitionToType(td, [], options).columns.column.tsType
+        ).toEqual('boolean');
       });
     });
 
     describe('maps to Object', () => {
       it('json', () => {
-        const td: TableDefinition = {
-          column: {
-            udtName: 'json',
-            nullable: false,
-            tsType: '',
+        const td: ITable = {
+          name: 'tableName',
+          columns: {
+            column: {
+              udtName: 'json',
+              nullable: false,
+              tsType: '',
+            },
           },
         };
-        expect(MysqlDBReflection.mapTableDefinitionToType(td, [], options).column.tsType).toEqual(
-          'Object'
-        );
+        expect(
+          MysqlDBReflection.mapTableDefinitionToType(td, [], options).columns.column.tsType
+        ).toEqual('Object');
       });
     });
 
     describe('maps to Date', () => {
       ['date', 'datetime', 'timestamp'].forEach(type =>
         it(type, () => {
-          const td: TableDefinition = {
-            column: {
-              udtName: type,
-              nullable: false,
-              tsType: '',
+          const td: ITable = {
+            name: 'tableName',
+            columns: {
+              column: {
+                udtName: type,
+                nullable: false,
+                tsType: '',
+              },
             },
           };
-          expect(MysqlDBReflection.mapTableDefinitionToType(td, [], options).column.tsType).toEqual(
+          expect(MysqlDBReflection.mapTableDefinitionToType(td, [], options).columns.column.tsType).toEqual(
             'Date'
           );
         })
@@ -357,14 +385,17 @@ describe('MysqlDatabase', () => {
     describe('maps to Buffer', () => {
       ['tinyblob', 'mediumblob', 'longblob', 'blob', 'binary', 'varbinary', 'bit'].forEach(type =>
         it(type, () => {
-          const td: TableDefinition = {
-            column: {
-              udtName: type,
-              nullable: false,
-              tsType: '',
+          const td: ITable = {
+            name: 'tableName',
+            columns: {
+              column: {
+                udtName: type,
+                nullable: false,
+                tsType: '',
+              },
             },
           };
-          expect(MysqlDBReflection.mapTableDefinitionToType(td, [], options).column.tsType).toEqual(
+          expect(MysqlDBReflection.mapTableDefinitionToType(td, [], options).columns.column.tsType).toEqual(
             'Buffer'
           );
         })
@@ -373,30 +404,36 @@ describe('MysqlDatabase', () => {
 
     describe('maps to custom', () => {
       it('CustomType', () => {
-        const td: TableDefinition = {
-          column: {
-            udtName: 'CustomType',
-            nullable: false,
-            tsType: '',
+        const td: ITable = {
+          name: 'tableName',
+          columns: {
+            column: {
+              udtName: 'CustomType',
+              nullable: false,
+              tsType: '',
+            },
           },
         };
         expect(
-          MysqlDBReflection.mapTableDefinitionToType(td, ['CustomType'], options).column.tsType
+          MysqlDBReflection.mapTableDefinitionToType(td, ['CustomType'], options).columns.column.tsType
         ).toEqual('CustomType');
       });
     });
 
     describe('maps to any', () => {
       it('UnknownType', () => {
-        const td: TableDefinition = {
-          column: {
-            udtName: 'UnknownType',
-            nullable: false,
-            tsType: '',
+        const td: ITable = {
+          name: 'tableName',
+          columns: {
+            column: {
+              udtName: 'UnknownType',
+              nullable: false,
+              tsType: '',
+            },
           },
         };
         expect(
-          MysqlDBReflection.mapTableDefinitionToType(td, ['CustomType'], options).column.tsType
+          MysqlDBReflection.mapTableDefinitionToType(td, ['CustomType'], options).columns.column.tsType
         ).toEqual('any');
       });
     });

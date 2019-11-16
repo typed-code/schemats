@@ -62,7 +62,7 @@ function buildHeader(
 
 async function typescriptOfTable(
   db: Database | string,
-  table: string,
+  tables: string[],
   schema: string,
   options = new Options()
 ) {
@@ -70,12 +70,13 @@ async function typescriptOfTable(
     db = getDatabase(db);
   }
 
-  const tableTypes = await db.getTableTypes(table, schema, options);
+  const tableTypes = await db.getTablesTypes(tables, schema, options);
 
-  let interfaces = '';
-  interfaces += generateTableTypes(table, tableTypes, options);
-  interfaces += generateTableInterface(table, tableTypes, options);
-  return interfaces;
+  return tableTypes.map(tableType => {
+    let interfaces = generateTableTypes(tableType, options);
+    interfaces += generateTableInterface(tableType, options);
+    return interfaces;
+  });
 }
 
 export async function typescriptOfSchema(
@@ -99,17 +100,14 @@ export async function typescriptOfSchema(
   const options = new Options(userOptions);
 
   const enumTypes = generateEnumType(await db.getEnumTypes(schema, tables), options);
-  const interfacePromises = tables.map(table =>
-    typescriptOfTable(db, table, schema as string, options)
-  );
-  const interfaces = await Promise.all(interfacePromises).then(tsOfTable => tsOfTable.join(''));
+  const interfaces = await typescriptOfTable(db, tables, schema as string, options);
 
   let output = '/* tslint:disable */\n\n';
   if (options.options.writeHeader) {
     output += buildHeader(db, tables, schema, options.options);
   }
   output += enumTypes;
-  output += interfaces;
+  output += interfaces.join('');
 
   const configFilePath = await prettier.resolveConfigFile();
   const prettierOptions = await prettier.resolveConfig(configFilePath || '');

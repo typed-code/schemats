@@ -2,7 +2,7 @@ import { keys, mapValues } from 'lodash';
 import * as PgPromise from 'pg-promise';
 import { Options } from './options';
 
-import { Database, TableDefinition } from './schemaInterfaces';
+import { Database, ITable } from './schemaInterfaces';
 
 const pgp = PgPromise();
 
@@ -14,11 +14,11 @@ export class PostgresDatabase implements Database {
   }
 
   private static mapTableDefinitionToType(
-    tableDefinition: TableDefinition,
+    tableDefinition: ITable,
     customTypes: string[],
     options: Options
-  ): TableDefinition {
-    return mapValues(tableDefinition, column => {
+  ): ITable {
+    tableDefinition.columns = mapValues(tableDefinition.columns, column => {
       switch (column.udtName) {
         case 'bpchar':
         case 'char':
@@ -96,6 +96,7 @@ export class PostgresDatabase implements Database {
           }
       }
     });
+    return tableDefinition;
   }
 
   public query(queryString: string) {
@@ -131,41 +132,51 @@ export class PostgresDatabase implements Database {
     return enums;
   }
 
-  public async getTableDefinition(
-    tableName: string,
-    tableSchema: string
-  ): Promise<TableDefinition> {
-    const tableDefinition: TableDefinition = {};
-
+  public async getTablesDefinition(tableNames: string[], tableSchema: string): Promise<ITable[]> {
     interface T {
+      table_name: string;
       column_name: string;
       udt_name: string;
       is_nullable: string;
     }
 
+    const tablesMap: { [tableName: string]: ITable } = {};
+
     await this.db.each<T>(
-      'SELECT column_name, udt_name, is_nullable ' +
+      'SELECT table_name, column_name, udt_name, is_nullable ' +
         'FROM information_schema.columns ' +
-        'WHERE table_name = $1 and table_schema = $2',
-      [tableName, tableSchema],
+        'WHERE table_schema = $1 and table_name IN ($2:csv) ' +
+        'ORDER BY table_name, column_name',
+      [tableSchema, tableNames],
       (schemaItem: T) => {
-        tableDefinition[schemaItem.column_name] = {
+        tablesMap[schemaItem.table_name] = tablesMap[schemaItem.table_name] || {
+          name: schemaItem.table_name,
+          columns: {},
+        };
+        const table = tablesMap[schemaItem.table_name];
+
+        table.columns[schemaItem.column_name] = {
           udtName: schemaItem.udt_name,
           nullable: schemaItem.is_nullable === 'YES',
           tsType: '',
         };
       }
     );
-    return tableDefinition;
+
+    return Object.values(tablesMap);
   }
 
-  public async getTableTypes(tableName: string, tableSchema: string, options: Options) {
+  public async getTablesTypes(
+    tableNames: string[],
+    tableSchema: string,
+    options: Options
+  ): Promise<ITable[]> {
     const enumTypes = await this.getEnumTypes();
     const customTypes = keys(enumTypes);
-    return PostgresDatabase.mapTableDefinitionToType(
-      await this.getTableDefinition(tableName, tableSchema),
-      customTypes,
-      options
+    const tableDefinitions = await this.getTablesDefinition(tableNames, tableSchema);
+
+    return tableDefinitions.map(table =>
+      PostgresDatabase.mapTableDefinitionToType(table, customTypes, options)
     );
   }
 

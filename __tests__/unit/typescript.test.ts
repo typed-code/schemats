@@ -6,21 +6,35 @@ const options = new Options({});
 describe('Typescript', () => {
   describe('generateTableInterface', () => {
     it('empty table definition object', () => {
-      const tableInterface = Typescript.generateTableInterface('tableName', {}, options);
+      const tableInterface = Typescript.generateTableInterface(
+        {
+          name: 'tableName',
+          columns: {},
+        },
+        options
+      );
       expect(tableInterface).toMatchSnapshot();
     });
 
     it('table name is reserved', () => {
-      const tableInterface = Typescript.generateTableInterface('package', {}, options);
+      const tableInterface = Typescript.generateTableInterface(
+        {
+          name: 'package',
+          columns: {},
+        },
+        options
+      );
       expect(tableInterface).toMatchSnapshot();
     });
 
     it('table with columns', () => {
       const tableInterface = Typescript.generateTableInterface(
-        'tableName',
         {
-          col1: { udtName: 'name1', nullable: false },
-          col2: { udtName: 'name2', nullable: false },
+          name: 'tableName',
+          columns: {
+            col1: { udtName: 'name1', nullable: false, tsType: '' },
+            col2: { udtName: 'name2', nullable: false, tsType: '' },
+          },
         },
         options
       );
@@ -29,11 +43,13 @@ describe('Typescript', () => {
 
     it('table with reserved columns', () => {
       const tableInterface = Typescript.generateTableInterface(
-        'tableName',
         {
-          string: { udtName: 'name1', nullable: false },
-          number: { udtName: 'name2', nullable: false },
-          package: { udtName: 'name3', nullable: false },
+          name: 'tableName',
+          columns: {
+            string: { udtName: 'name1', nullable: false, tsType: '' },
+            number: { udtName: 'name2', nullable: false, tsType: '' },
+            package: { udtName: 'name3', nullable: false, tsType: '' },
+          },
         },
         options
       );
@@ -85,16 +101,18 @@ describe('Typescript', () => {
   });
   describe('generateTableTypes', () => {
     it('empty table definition object', () => {
-      const tableTypes = Typescript.generateTableTypes('tableName', {}, options);
+      const tableTypes = Typescript.generateTableTypes({ name: 'tableName', columns: {} }, options);
       expect(tableTypes).toMatchSnapshot();
     });
 
     it('with table definitions', () => {
       const tableTypes = Typescript.generateTableTypes(
-        'tableName',
         {
-          col1: { udtName: 'name1', nullable: false, tsType: 'string' },
-          col2: { udtName: 'name2', nullable: false, tsType: 'number' },
+          name: 'tableName',
+          columns: {
+            col1: { udtName: 'name1', nullable: false, tsType: 'string' },
+            col2: { udtName: 'name2', nullable: false, tsType: 'number' },
+          },
         },
         options
       );
@@ -103,10 +121,12 @@ describe('Typescript', () => {
 
     it('with nullable column definitions', () => {
       const tableTypes = Typescript.generateTableTypes(
-        'tableName',
         {
-          col1: { udtName: 'name1', nullable: true, tsType: 'string' },
-          col2: { udtName: 'name2', nullable: true, tsType: 'number' },
+          name: 'tableName',
+          columns: {
+            col1: { udtName: 'name1', nullable: true, tsType: 'string' },
+            col2: { udtName: 'name2', nullable: true, tsType: 'number' },
+          },
         },
         options
       );
