@@ -141,13 +141,20 @@ export class PostgresDatabase implements Database {
     }
 
     const tablesMap: { [tableName: string]: ITable } = {};
+    let whereClauseAddition = '';
+    const params: any[] = [tableSchema];
+
+    if (tableNames.length) {
+      whereClauseAddition = `and table_name IN ($2:csv) `;
+      params.push(tableNames);
+    }
 
     await this.db.each<T>(
       'SELECT table_name, column_name, udt_name, is_nullable ' +
         'FROM information_schema.columns ' +
-        'WHERE table_schema = $1 and table_name IN ($2:csv) ' +
+        `WHERE table_schema = $1 ${whereClauseAddition}` +
         'ORDER BY table_name, column_name',
-      [tableSchema, tableNames],
+      params,
       (schemaItem: T) => {
         tablesMap[schemaItem.table_name] = tablesMap[schemaItem.table_name] || {
           name: schemaItem.table_name,

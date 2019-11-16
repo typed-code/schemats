@@ -154,6 +154,14 @@ export class MysqlDatabase implements Database {
   }
 
   public async getTablesDefinition(tableNames: string[], tableSchema: string): Promise<ITable[]> {
+    const params = [tableSchema];
+    let whereClauseAddition = '';
+
+    if (tableNames.length) {
+      params.push(...tableNames);
+      whereClauseAddition = `and table_name IN (${tableNames.map(_ => '?').join(',')}) `;
+    }
+
     const tableColumns = await this.queryAsync<{
       table_name: string;
       column_name: string;
@@ -162,10 +170,10 @@ export class MysqlDatabase implements Database {
     }>(
       'SELECT table_name, column_name, data_type, is_nullable ' +
         'FROM information_schema.columns ' +
-        'WHERE table_schema = ? and ' +
-        `table_name IN (${tableNames.map(_ => '?').join(',')}) ` +
+        'WHERE table_schema = ? ' +
+        whereClauseAddition +
         'ORDER BY table_name, column_name',
-      [tableSchema, ...tableNames]
+      params
     );
 
     const tablesMap = tableColumns.reduce(
