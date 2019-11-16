@@ -87,7 +87,10 @@ export class MysqlDatabase implements Database {
   }
 
   private static parseMysqlEnumeration(mysqlEnum: string): string[] {
-    return mysqlEnum.replace(/(^(enum|set)\('|'\)$)/gi, '').split(`','`);
+    return mysqlEnum
+      .replace(/(^(enum|set)\('|'\)$)/gi, '')
+      .split(`','`)
+      .sort();
   }
 
   private static getEnumNameFromColumn(dataType: string, columnName: string): string {

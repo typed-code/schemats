@@ -1,5 +1,5 @@
 import { typescriptOfSchema } from '../../src';
-import { aProductsTable, aUsersTable } from '../builders/mysqlTable.builder';
+import { aProductsTable, aUsersTable, MysqlTableBuilder } from '../builders/mysqlTable.builder';
 import { MysqlDriver } from '../drivers/mysql.driver';
 
 describe('Type generation for MySQL', () => {
@@ -32,5 +32,39 @@ describe('Type generation for MySQL', () => {
     expect(res).toContain('namespace usersFields');
     expect(res).toContain('interface users');
     expect(res).not.toContain('type_enum');
+  });
+
+  it('should merge enums collision with the same values', async () => {
+    const ordersTable = new MysqlTableBuilder('orders').with
+      .column('id', 'int')
+      .with.enum('type', ['digital', 'physical'])
+      .build();
+
+    const schema = 'schemaName';
+    driver.given
+      .table(schema, aUsersTable)
+      .given.table(schema, aProductsTable)
+      .given.table(schema, ordersTable);
+
+    const res = await typescriptOfSchema('mysql://', [], schema);
+
+    expect(res).toContain(`export type type_enum = 'digital' | 'physical';`);
+  });
+
+  it('should merge enums collision with the same values but with different order', async () => {
+    const ordersTable = new MysqlTableBuilder('orders').with
+      .column('id', 'int')
+      .with.enum('type', ['physical', 'digital'])
+      .build();
+
+    const schema = 'schemaName';
+    driver.given
+      .table(schema, aUsersTable)
+      .given.table(schema, aProductsTable)
+      .given.table(schema, ordersTable);
+
+    const res = await typescriptOfSchema('mysql://', [], schema);
+
+    expect(res).toContain(`export type type_enum = 'digital' | 'physical';`);
   });
 });

@@ -43,7 +43,7 @@ export interface ITable {
 }
 
 export class MysqlTableBuilder {
-  public data: ITable = {
+  private data: ITable = {
     name: '',
     columns: [],
   };
