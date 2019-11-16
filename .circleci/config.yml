@@ -21,7 +21,7 @@ jobs:
           MYSQL_DATABASE: test_db
           MYSQL_USER: user
           MYSQL_PASSWORD: passw0rd
-      - image: circleci/postgres:9.6.5-alpine-ram
+      - image: circleci/postgres:11.1-alpine-ram
         environment:
           POSTGRES_USER: postgres
           POSTGRES_DB: test_db
