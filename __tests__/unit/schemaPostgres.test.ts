@@ -31,10 +31,10 @@ describe('PostgresDatabase', () => {
       await PostgresProxy.getEnumTypes('schemaName');
       expect(db.pgpStub.each).toHaveBeenCalledWith(
         'select n.nspname as schema, t.typname as name, e.enumlabel as value ' +
-        'from pg_type t join pg_enum e on t.oid = e.enumtypid ' +
-        'join pg_catalog.pg_namespace n ON n.oid = t.typnamespace ' +
-        `where n.nspname = 'schemaName' ` +
-        'order by t.typname asc, e.enumlabel asc;',
+          'from pg_type t join pg_enum e on t.oid = e.enumtypid ' +
+          'join pg_catalog.pg_namespace n ON n.oid = t.typnamespace ' +
+          `where n.nspname = 'schemaName' ` +
+          'order by t.typname asc, e.enumlabel asc;',
         [],
         expect.any(Function)
       );
@@ -44,9 +44,9 @@ describe('PostgresDatabase', () => {
       await PostgresProxy.getEnumTypes();
       expect(db.pgpStub.each).toHaveBeenCalledWith(
         'select n.nspname as schema, t.typname as name, e.enumlabel as value ' +
-        'from pg_type t join pg_enum e on t.oid = e.enumtypid ' +
-        'join pg_catalog.pg_namespace n ON n.oid = t.typnamespace  ' +
-        'order by t.typname asc, e.enumlabel asc;',
+          'from pg_type t join pg_enum e on t.oid = e.enumtypid ' +
+          'join pg_catalog.pg_namespace n ON n.oid = t.typnamespace  ' +
+          'order by t.typname asc, e.enumlabel asc;',
         [],
         expect.any(Function)
       );
@@ -55,7 +55,10 @@ describe('PostgresDatabase', () => {
     it('handles response from db', async () => {
       const enums = await PostgresProxy.getEnumTypes();
       const callback = db.pgpStub.each.mock.calls[0][2];
-      const dbResponse = [{ name: 'name', value: 'value1' }, { name: 'name', value: 'value2' }];
+      const dbResponse = [
+        { name: 'name', value: 'value1' },
+        { name: 'name', value: 'value2' },
+      ];
       dbResponse.forEach(callback);
       expect(enums).toEqual({ name: ['value1', 'value2'] });
     });
@@ -66,8 +69,8 @@ describe('PostgresDatabase', () => {
       await PostgresProxy.getTableDefinition('tableName', 'schemaName');
       expect(db.pgpStub.each).toHaveBeenCalledWith(
         'SELECT column_name, udt_name, is_nullable ' +
-        'FROM information_schema.columns ' +
-        'WHERE table_name = $1 and table_schema = $2',
+          'FROM information_schema.columns ' +
+          'WHERE table_name = $1 and table_schema = $2',
         ['tableName', 'schemaName'],
         expect.any(Function)
       );
@@ -83,8 +86,8 @@ describe('PostgresDatabase', () => {
       dbResponse.forEach(callback);
 
       expect(tableDefinition).toEqual({
-        col1: { udtName: 'int2', nullable: true },
-        col2: { udtName: 'text', nullable: false },
+        col1: { udtName: 'int2', nullable: true, tsType: '' },
+        col2: { udtName: 'text', nullable: false, tsType: '' },
       });
     });
   });
@@ -146,9 +149,9 @@ describe('PostgresDatabase', () => {
       PostgresProxy.getSchemaTables('schemaName');
       expect(db.pgpStub.map).toHaveBeenCalledWith(
         'SELECT table_name ' +
-        'FROM information_schema.columns ' +
-        'WHERE table_schema = $1 ' +
-        'GROUP BY table_name ORDER BY table_name',
+          'FROM information_schema.columns ' +
+          'WHERE table_schema = $1 ' +
+          'GROUP BY table_name ORDER BY table_name',
         ['schemaName'],
         expect.any(Function)
       );
@@ -185,6 +188,7 @@ describe('PostgresDatabase', () => {
             column: {
               udtName: type,
               nullable: false,
+              tsType: ''
             },
           };
           expect(
@@ -201,6 +205,7 @@ describe('PostgresDatabase', () => {
             column: {
               udtName: type,
               nullable: false,
+              tsType: ''
             },
           };
           expect(
@@ -216,6 +221,7 @@ describe('PostgresDatabase', () => {
           column: {
             udtName: 'bool',
             nullable: false,
+            tsType: ''
           },
         };
         expect(
@@ -231,6 +237,7 @@ describe('PostgresDatabase', () => {
             column: {
               udtName: type,
               nullable: false,
+              tsType: ''
             },
           };
           expect(
@@ -247,6 +254,7 @@ describe('PostgresDatabase', () => {
             column: {
               udtName: type,
               nullable: false,
+              tsType: ''
             },
           };
           expect(
@@ -263,6 +271,7 @@ describe('PostgresDatabase', () => {
             column: {
               udtName: type,
               nullable: false,
+              tsType: ''
             },
           };
           expect(
@@ -278,11 +287,11 @@ describe('PostgresDatabase', () => {
           column: {
             udtName: '_bool',
             nullable: false,
+            tsType: ''
           },
         };
         expect(
-          PostgresDBReflection.mapTableDefinitionToType(td, ['CustomType'], options).column
-            .tsType
+          PostgresDBReflection.mapTableDefinitionToType(td, ['CustomType'], options).column.tsType
         ).toEqual('Array<boolean>');
       });
     });
@@ -294,6 +303,7 @@ describe('PostgresDatabase', () => {
             column: {
               udtName: type,
               nullable: false,
+              tsType: ''
             },
           };
           expect(
@@ -310,6 +320,7 @@ describe('PostgresDatabase', () => {
             column: {
               udtName: type,
               nullable: false,
+              tsType: ''
             },
           };
           expect(
@@ -325,6 +336,7 @@ describe('PostgresDatabase', () => {
           column: {
             udtName: '_timestamptz',
             nullable: false,
+            tsType: ''
           },
         };
         expect(
@@ -339,11 +351,11 @@ describe('PostgresDatabase', () => {
           column: {
             udtName: 'CustomType',
             nullable: false,
+            tsType: ''
           },
         };
         expect(
-          PostgresDBReflection.mapTableDefinitionToType(td, ['CustomType'], options).column
-            .tsType
+          PostgresDBReflection.mapTableDefinitionToType(td, ['CustomType'], options).column.tsType
         ).toEqual('CustomType');
       });
     });
@@ -353,11 +365,11 @@ describe('PostgresDatabase', () => {
           column: {
             udtName: 'UnknownType',
             nullable: false,
+            tsType: ''
           },
         };
         expect(
-          PostgresDBReflection.mapTableDefinitionToType(td, ['CustomType'], options).column
-            .tsType
+          PostgresDBReflection.mapTableDefinitionToType(td, ['CustomType'], options).column.tsType
         ).toEqual('any');
       });
     });

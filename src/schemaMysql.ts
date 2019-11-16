@@ -21,7 +21,7 @@ export class MysqlDatabase implements Database {
     options: Options
   ): TableDefinition {
     if (!options) {
-      throw new Error();
+      throw new Error('No options given');
     }
     return mapValues(tableDefinition, column => {
       switch (column.udtName) {
@@ -71,7 +71,7 @@ export class MysqlDatabase implements Database {
           column.tsType = 'Buffer';
           return column;
         default:
-          if (customTypes.indexOf(column.udtName) !== -1) {
+          if (customTypes.includes(column.udtName)) {
             column.tsType = options.transformTypeName(column.udtName);
             return column;
           } else {
@@ -94,8 +94,8 @@ export class MysqlDatabase implements Database {
     return `${columnName}_${dataType}`;
   }
 
-  public query(queryString: string) {
-    return this.queryAsync(queryString);
+  public query<T = object>(queryString: string) {
+    return this.queryAsync<T>(queryString);
   }
 
   public async getEnumTypes(
@@ -114,60 +114,65 @@ export class MysqlDatabase implements Database {
       params.push(...tables);
     }
 
-    const rawEnumRecords = await this.queryAsync(
+    const rawEnumRecords = await this.queryAsync<{
+      column_name: string;
+      column_type: string;
+      data_type: string;
+    }>(
       'SELECT column_name, column_type, data_type ' +
         'FROM information_schema.columns ' +
         `WHERE data_type IN ('enum', 'set') ${additionWhereClause}ORDER BY column_name`,
       params
     );
 
-    return rawEnumRecords.reduce(
-      (enums, enumItem: { column_name: string; column_type: string; data_type: string }) => {
-        const enumName = MysqlDatabase.getEnumNameFromColumn(
-          enumItem.data_type,
-          enumItem.column_name
-        );
-        const enumValues = MysqlDatabase.parseMysqlEnumeration(enumItem.column_type);
+    return rawEnumRecords.reduce((enums, enumItem) => {
+      const enumName = MysqlDatabase.getEnumNameFromColumn(
+        enumItem.data_type,
+        enumItem.column_name
+      );
+      const enumValues = MysqlDatabase.parseMysqlEnumeration(enumItem.column_type);
 
-        if (enums[enumName] && !isEqual(enums[enumName], enumValues)) {
-          const errorMsg =
-            `Multiple enums with the same name and contradicting types were found: ` +
-            `${enumItem.column_name}: ${JSON.stringify(enums[enumName])} and ${JSON.stringify(
-              enumValues
-            )}`;
-          throw new Error(errorMsg);
-        }
+      if (enums[enumName] && !isEqual(enums[enumName], enumValues)) {
+        const errorMsg =
+          `Multiple enums with the same name and contradicting types were found: ` +
+          `${enumItem.column_name}: ${JSON.stringify(enums[enumName])} and ${JSON.stringify(
+            enumValues
+          )}`;
+        throw new Error(errorMsg);
+      }
 
-        enums[enumName] = enumValues;
+      enums[enumName] = enumValues;
 
-        return enums;
-      },
-      {} as any
-    );
+      return enums;
+    }, {} as any);
   }
 
-  public async getTableDefinition(tableName: string, tableSchema: string) {
-    const tableDefinition: TableDefinition = {};
-
-    const tableColumns = await this.queryAsync(
+  public async getTableDefinition(
+    tableName: string,
+    tableSchema: string
+  ): Promise<TableDefinition> {
+    const tableColumns = await this.queryAsync<{
+      column_name: string;
+      data_type: string;
+      is_nullable: 'YES' | 'NO';
+    }>(
       'SELECT column_name, data_type, is_nullable ' +
         'FROM information_schema.columns ' +
         'WHERE table_name = ? and table_schema = ? ORDER BY column_name',
       [tableName, tableSchema]
     );
-    tableColumns.map(
-      (schemaItem: { column_name: string; data_type: string; is_nullable: string }) => {
-        const columnName = schemaItem.column_name;
-        const dataType = schemaItem.data_type;
-        tableDefinition[columnName] = {
-          udtName: /^(enum|set)$/i.test(dataType)
-            ? MysqlDatabase.getEnumNameFromColumn(dataType, columnName)
-            : dataType,
-          nullable: schemaItem.is_nullable === 'YES',
-        };
-      }
-    );
-    return tableDefinition;
+
+    return tableColumns.reduce((result, { column_name, data_type, is_nullable }) => {
+      result[column_name] = {
+        udtName: /^(enum|set)$/i.test(data_type)
+          ? MysqlDatabase.getEnumNameFromColumn(data_type, column_name)
+          : data_type,
+        nullable: is_nullable === 'YES',
+        tsType: '',
+      };
+
+      return result;
+    }, ({} as unknown) as TableDefinition);
   }
 
   public async getTableTypes(tableName: string, tableSchema: string, options: Options) {
@@ -182,23 +187,23 @@ export class MysqlDatabase implements Database {
   }
 
   public async getSchemaTables(schemaName: string): Promise<string[]> {
-    const schemaTables = await this.queryAsync(
+    const schemaTables = await this.queryAsync<{ table_name: string }>(
       'SELECT table_name ' +
         'FROM information_schema.columns ' +
         'WHERE table_schema = ? ' +
         'GROUP BY table_name ORDER BY table_name',
       [schemaName]
     );
-    return schemaTables.map((schemaItem: { table_name: string }) => schemaItem.table_name);
+    return schemaTables.map(({ table_name }) => table_name);
   }
 
-  public queryAsync(queryString: string, escapedValues?: string[]): Promise<object[]> {
+  public queryAsync<T = object>(queryString: string, escapedValues?: string[]): Promise<T[]> {
     return new Promise((resolve, reject) => {
-      this.db.query(queryString, escapedValues, (error: MysqlError, results: object[]) => {
+      this.db.query(queryString, escapedValues, (error: MysqlError, results: T[]) => {
         if (error) {
           return reject(error);
         }
-        return resolve(this.toLowerCaseColumnName(results));
+        return resolve(this.toLowerCaseColumnName<T>(results));
       });
     });
   }
@@ -207,7 +212,7 @@ export class MysqlDatabase implements Database {
     return this.defaultSchema;
   }
 
-  private toLowerCaseColumnName(results: object[]): object[] {
+  private toLowerCaseColumnName<T>(results: T[]): T[] {
     return results.map((row: any) =>
       Object.keys(row).reduce((newRow, key) => {
         newRow[key.toLowerCase()] = row[key];

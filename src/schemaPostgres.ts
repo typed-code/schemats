@@ -131,7 +131,10 @@ export class PostgresDatabase implements Database {
     return enums;
   }
 
-  public async getTableDefinition(tableName: string, tableSchema: string) {
+  public async getTableDefinition(
+    tableName: string,
+    tableSchema: string
+  ): Promise<TableDefinition> {
     const tableDefinition: TableDefinition = {};
 
     interface T {
@@ -149,6 +152,7 @@ export class PostgresDatabase implements Database {
         tableDefinition[schemaItem.column_name] = {
           udtName: schemaItem.udt_name,
           nullable: schemaItem.is_nullable === 'YES',
+          tsType: '',
         };
       }
     );

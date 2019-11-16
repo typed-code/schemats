@@ -82,7 +82,7 @@ export async function typescriptOfSchema(
   db: Database | string,
   tables: string[] = [],
   schema: string | null = null,
-  options: OptionValues = {}
+  userOptions: OptionValues = {}
 ): Promise<string> {
   if (typeof db === 'string') {
     db = getDatabase(db);
@@ -96,17 +96,17 @@ export async function typescriptOfSchema(
     tables = await db.getSchemaTables(schema);
   }
 
-  const optionsObject = new Options(options);
+  const options = new Options(userOptions);
 
-  const enumTypes = generateEnumType(await db.getEnumTypes(schema, tables), optionsObject);
+  const enumTypes = generateEnumType(await db.getEnumTypes(schema, tables), options);
   const interfacePromises = tables.map(table =>
-    typescriptOfTable(db, table, schema as string, optionsObject)
+    typescriptOfTable(db, table, schema as string, options)
   );
   const interfaces = await Promise.all(interfacePromises).then(tsOfTable => tsOfTable.join(''));
 
   let output = '/* tslint:disable */\n\n';
-  if (optionsObject.options.writeHeader) {
-    output += buildHeader(db, tables, schema, options);
+  if (options.options.writeHeader) {
+    output += buildHeader(db, tables, schema, options.options);
   }
   output += enumTypes;
   output += interfaces;

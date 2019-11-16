@@ -161,9 +161,9 @@ describe('MysqlDatabase', () => {
 
       const schemaTables = await mysqlProxy.getTableDefinition('testtable', 'testschema');
       expect(schemaTables).toEqual({
-        column1: { udtName: 'data1', nullable: false },
-        column2: { udtName: 'column2_enum', nullable: true },
-        column3: { udtName: 'column3_set', nullable: true },
+        column1: { udtName: 'data1', nullable: false, tsType: '' },
+        column2: { udtName: 'column2_enum', nullable: true, tsType: '' },
+        column3: { udtName: 'column3_set', nullable: true, tsType: '' },
       });
     });
   });
@@ -269,6 +269,7 @@ describe('MysqlDatabase', () => {
             column: {
               udtName: type,
               nullable: false,
+              tsType: '',
             },
           };
           expect(MysqlDBReflection.mapTableDefinitionToType(td, [], options).column.tsType).toEqual(
@@ -296,6 +297,7 @@ describe('MysqlDatabase', () => {
             column: {
               udtName: type,
               nullable: false,
+              tsType: '',
             },
           };
           expect(MysqlDBReflection.mapTableDefinitionToType(td, [], options).column.tsType).toEqual(
@@ -311,6 +313,7 @@ describe('MysqlDatabase', () => {
           column: {
             udtName: 'tinyint',
             nullable: false,
+            tsType: '',
           },
         };
         expect(MysqlDBReflection.mapTableDefinitionToType(td, [], options).column.tsType).toEqual(
@@ -325,6 +328,7 @@ describe('MysqlDatabase', () => {
           column: {
             udtName: 'json',
             nullable: false,
+            tsType: '',
           },
         };
         expect(MysqlDBReflection.mapTableDefinitionToType(td, [], options).column.tsType).toEqual(
@@ -340,6 +344,7 @@ describe('MysqlDatabase', () => {
             column: {
               udtName: type,
               nullable: false,
+              tsType: '',
             },
           };
           expect(MysqlDBReflection.mapTableDefinitionToType(td, [], options).column.tsType).toEqual(
@@ -356,6 +361,7 @@ describe('MysqlDatabase', () => {
             column: {
               udtName: type,
               nullable: false,
+              tsType: '',
             },
           };
           expect(MysqlDBReflection.mapTableDefinitionToType(td, [], options).column.tsType).toEqual(
@@ -371,6 +377,7 @@ describe('MysqlDatabase', () => {
           column: {
             udtName: 'CustomType',
             nullable: false,
+            tsType: '',
           },
         };
         expect(
@@ -385,6 +392,7 @@ describe('MysqlDatabase', () => {
           column: {
             udtName: 'UnknownType',
             nullable: false,
+            tsType: '',
           },
         };
         expect(
