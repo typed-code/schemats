@@ -5,7 +5,7 @@
 
 import * as _ from 'lodash';
 
-import Options from './options';
+import { Options } from './options';
 import { TableDefinition } from './schemaInterfaces';
 
 function nameIsReservedKeyword(name: string): boolean {

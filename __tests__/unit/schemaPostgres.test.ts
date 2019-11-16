@@ -1,5 +1,5 @@
 import * as pgp from 'pg-promise';
-import Options from '../../src/options';
+import { Options } from '../../src/options';
 import { TableDefinition } from '../../src/schemaInterfaces';
 import { PostgresDatabase } from '../../src/schemaPostgres';
 
@@ -31,10 +31,10 @@ describe('PostgresDatabase', () => {
       await PostgresProxy.getEnumTypes('schemaName');
       expect(db.pgpStub.each).toHaveBeenCalledWith(
         'select n.nspname as schema, t.typname as name, e.enumlabel as value ' +
-          'from pg_type t join pg_enum e on t.oid = e.enumtypid ' +
-          'join pg_catalog.pg_namespace n ON n.oid = t.typnamespace ' +
-          `where n.nspname = 'schemaName' ` +
-          'order by t.typname asc, e.enumlabel asc;',
+        'from pg_type t join pg_enum e on t.oid = e.enumtypid ' +
+        'join pg_catalog.pg_namespace n ON n.oid = t.typnamespace ' +
+        `where n.nspname = 'schemaName' ` +
+        'order by t.typname asc, e.enumlabel asc;',
         [],
         expect.any(Function)
       );
@@ -44,9 +44,9 @@ describe('PostgresDatabase', () => {
       await PostgresProxy.getEnumTypes();
       expect(db.pgpStub.each).toHaveBeenCalledWith(
         'select n.nspname as schema, t.typname as name, e.enumlabel as value ' +
-          'from pg_type t join pg_enum e on t.oid = e.enumtypid ' +
-          'join pg_catalog.pg_namespace n ON n.oid = t.typnamespace  ' +
-          'order by t.typname asc, e.enumlabel asc;',
+        'from pg_type t join pg_enum e on t.oid = e.enumtypid ' +
+        'join pg_catalog.pg_namespace n ON n.oid = t.typnamespace  ' +
+        'order by t.typname asc, e.enumlabel asc;',
         [],
         expect.any(Function)
       );
@@ -66,8 +66,8 @@ describe('PostgresDatabase', () => {
       await PostgresProxy.getTableDefinition('tableName', 'schemaName');
       expect(db.pgpStub.each).toHaveBeenCalledWith(
         'SELECT column_name, udt_name, is_nullable ' +
-          'FROM information_schema.columns ' +
-          'WHERE table_name = $1 and table_schema = $2',
+        'FROM information_schema.columns ' +
+        'WHERE table_name = $1 and table_schema = $2',
         ['tableName', 'schemaName'],
         expect.any(Function)
       );
@@ -146,9 +146,9 @@ describe('PostgresDatabase', () => {
       PostgresProxy.getSchemaTables('schemaName');
       expect(db.pgpStub.map).toHaveBeenCalledWith(
         'SELECT table_name ' +
-          'FROM information_schema.columns ' +
-          'WHERE table_schema = $1 ' +
-          'GROUP BY table_name ORDER BY table_name',
+        'FROM information_schema.columns ' +
+        'WHERE table_schema = $1 ' +
+        'GROUP BY table_name ORDER BY table_name',
         ['schemaName'],
         expect.any(Function)
       );

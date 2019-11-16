@@ -1,5 +1,5 @@
 import * as mysql from 'mysql';
-import Options from '../../src/options';
+import { Options } from '../../src/options';
 import { TableDefinition } from '../../src/schemaInterfaces';
 import { MysqlDatabase } from '../../src/schemaMysql';
 

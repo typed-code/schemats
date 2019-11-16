@@ -5,7 +5,7 @@
 
 import * as pkgUp from 'pkg-up';
 import * as prettier from 'prettier';
-import Options, { OptionValues } from './options';
+import { Options, OptionValues } from './options';
 import { Database, getDatabase } from './schema';
 import { generateEnumType, generateTableInterface, generateTableTypes } from './typescript';
 

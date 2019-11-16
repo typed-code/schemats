@@ -1,4 +1,4 @@
-import Options from '../../src/options';
+import { Options } from '../../src/options';
 import * as Typescript from '../../src/typescript';
 
 const options = new Options({});

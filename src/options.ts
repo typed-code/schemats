@@ -10,7 +10,7 @@ export interface OptionValues {
   writeHeader?: boolean; // write schemats description header
 }
 
-export default class Options {
+export class Options {
   public options: OptionValues;
 
   constructor(options: OptionValues = {}) {

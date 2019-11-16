@@ -1,7 +1,7 @@
 import { isEqual, keys, mapValues } from 'lodash';
 import { Connection, createConnection, MysqlError } from 'mysql';
 import { parse as urlParse } from 'url';
-import Options from './options';
+import { Options } from './options';
 import { Database, TableDefinition } from './schemaInterfaces';
 
 export class MysqlDatabase implements Database {
