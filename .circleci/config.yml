@@ -52,11 +52,6 @@ jobs:
               sleep 1
             done
             echo Failed waiting for MySQL && exit 1
-      # Import DB Dump
-      - run:
-          name: Install MySQL CLI
-          command: |
-            sudo apt-get install mysql-client
       - run:
           name: Run Tests
           command: npm test
