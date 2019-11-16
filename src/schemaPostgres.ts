@@ -2,7 +2,7 @@ import { keys, mapValues } from 'lodash';
 import * as PgPromise from 'pg-promise';
 import { Options } from './options';
 
-import { Database, ITable } from './schemaInterfaces';
+import { Database, ICustomTypes, ITable } from './schemaInterfaces';
 
 const pgp = PgPromise();
 
@@ -176,14 +176,14 @@ export class PostgresDatabase implements Database {
   public async getTablesTypes(
     tableNames: string[],
     tableSchema: string,
+    customTypes: ICustomTypes,
     options: Options
   ): Promise<ITable[]> {
-    const enumTypes = await this.getEnumTypes();
-    const customTypes = keys(enumTypes);
+    const customTypesKeys = keys(customTypes);
     const tableDefinitions = await this.getTablesDefinition(tableNames, tableSchema);
 
     return tableDefinitions.map(table =>
-      PostgresDatabase.mapTableDefinitionToType(table, customTypes, options)
+      PostgresDatabase.mapTableDefinitionToType(table, customTypesKeys, options)
     );
   }
 

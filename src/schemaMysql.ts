@@ -2,7 +2,7 @@ import { isEqual, keys, mapValues } from 'lodash';
 import { Connection, createConnection, MysqlError } from 'mysql';
 import { parse as urlParse } from 'url';
 import { Options } from './options';
-import { Database, ITable } from './schemaInterfaces';
+import { Database, ICustomTypes, ITable } from './schemaInterfaces';
 
 export class MysqlDatabase implements Database {
   private db: Connection;
@@ -204,15 +204,15 @@ export class MysqlDatabase implements Database {
   public async getTablesTypes(
     tableNames: string[],
     tableSchema: string,
+    customTypes: ICustomTypes,
     options: Options
   ): Promise<ITable[]> {
-    const enumTypes = await this.getEnumTypes(tableSchema);
-    const customTypes = keys(enumTypes);
+    const customTypesKeys = keys(customTypes);
 
     const tableDefinitions = await this.getTablesDefinition(tableNames, tableSchema);
 
     return tableDefinitions.map(table =>
-      MysqlDatabase.mapTableDefinitionToType(table, customTypes, options)
+      MysqlDatabase.mapTableDefinitionToType(table, customTypesKeys, options)
     );
   }
 

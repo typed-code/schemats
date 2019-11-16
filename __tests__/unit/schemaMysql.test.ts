@@ -187,15 +187,17 @@ describe('MysqlDatabase', () => {
     });
 
     it('gets custom types from enums', async () => {
-      (MysqlDatabase as any).prototype.getEnumTypes.mockReturnValue(
-        Promise.resolve({
-          enum1: [],
-          enum2: [],
-        })
-      );
       (MysqlDatabase as any).prototype.getTablesDefinition.mockReturnValue(Promise.resolve([{}]));
 
-      await mysqlProxy.getTablesTypes(['tableName'], 'tableSchema', options);
+      await mysqlProxy.getTablesTypes(
+        ['tableName'],
+        'tableSchema',
+        {
+          enum1: [],
+          enum2: [],
+        },
+        options
+      );
       expect(MysqlDBReflection.mapTableDefinitionToType).toHaveBeenCalledWith(
         { columns: {} },
         ['enum1', 'enum2'],
@@ -204,7 +206,6 @@ describe('MysqlDatabase', () => {
     });
 
     it('gets table definitions', async () => {
-      (MysqlDatabase as any).prototype.getEnumTypes.mockReturnValue(Promise.resolve({}));
       (MysqlDatabase as any).prototype.getTablesDefinition.mockReturnValue(
         Promise.resolve([
           {
@@ -218,7 +219,7 @@ describe('MysqlDatabase', () => {
           },
         ])
       );
-      await mysqlProxy.getTablesTypes(['tableName'], 'tableSchema', options);
+      await mysqlProxy.getTablesTypes(['tableName'], 'tableSchema', {}, options);
       expect(MysqlDBReflection.prototype.getTablesDefinition).toHaveBeenCalledWith(
         ['tableName'],
         'tableSchema'
@@ -375,9 +376,9 @@ describe('MysqlDatabase', () => {
               },
             },
           };
-          expect(MysqlDBReflection.mapTableDefinitionToType(td, [], options).columns.column.tsType).toEqual(
-            'Date'
-          );
+          expect(
+            MysqlDBReflection.mapTableDefinitionToType(td, [], options).columns.column.tsType
+          ).toEqual('Date');
         })
       );
     });
@@ -395,9 +396,9 @@ describe('MysqlDatabase', () => {
               },
             },
           };
-          expect(MysqlDBReflection.mapTableDefinitionToType(td, [], options).columns.column.tsType).toEqual(
-            'Buffer'
-          );
+          expect(
+            MysqlDBReflection.mapTableDefinitionToType(td, [], options).columns.column.tsType
+          ).toEqual('Buffer');
         })
       );
     });
@@ -415,7 +416,8 @@ describe('MysqlDatabase', () => {
           },
         };
         expect(
-          MysqlDBReflection.mapTableDefinitionToType(td, ['CustomType'], options).columns.column.tsType
+          MysqlDBReflection.mapTableDefinitionToType(td, ['CustomType'], options).columns.column
+            .tsType
         ).toEqual('CustomType');
       });
     });
@@ -433,7 +435,8 @@ describe('MysqlDatabase', () => {
           },
         };
         expect(
-          MysqlDBReflection.mapTableDefinitionToType(td, ['CustomType'], options).columns.column.tsType
+          MysqlDBReflection.mapTableDefinitionToType(td, ['CustomType'], options).columns.column
+            .tsType
         ).toEqual('any');
       });
     });

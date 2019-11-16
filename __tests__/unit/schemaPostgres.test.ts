@@ -111,9 +111,16 @@ describe('PostgresDatabase', () => {
     });
 
     it('gets custom types from enums', async () => {
-      PostgresProxy.getEnumTypes.mockReturnValue(Promise.resolve({ enum1: [], enum2: [] }));
       PostgresProxy.getTablesDefinition.mockReturnValue(Promise.resolve([{}]));
-      await PostgresProxy.getTablesTypes(['tableName'], 'tableSchema', {} as any);
+      await PostgresProxy.getTablesTypes(
+        ['tableName'],
+        'tableSchema',
+        {
+          enum1: [],
+          enum2: [],
+        },
+        {} as any
+      );
       expect(PostgresDBReflection.mapTableDefinitionToType).toHaveBeenCalledWith(
         { columns: {} },
         ['enum1', 'enum2'],
@@ -324,7 +331,8 @@ describe('PostgresDatabase', () => {
           },
         };
         expect(
-          PostgresDBReflection.mapTableDefinitionToType(td, ['CustomType'], options).columns.column.tsType
+          PostgresDBReflection.mapTableDefinitionToType(td, ['CustomType'], options).columns.column
+            .tsType
         ).toEqual('Array<boolean>');
       });
     });
@@ -400,7 +408,8 @@ describe('PostgresDatabase', () => {
           },
         };
         expect(
-          PostgresDBReflection.mapTableDefinitionToType(td, ['CustomType'], options).columns.column.tsType
+          PostgresDBReflection.mapTableDefinitionToType(td, ['CustomType'], options).columns.column
+            .tsType
         ).toEqual('CustomType');
       });
     });
@@ -417,7 +426,8 @@ describe('PostgresDatabase', () => {
           },
         };
         expect(
-          PostgresDBReflection.mapTableDefinitionToType(td, ['CustomType'], options).columns.column.tsType
+          PostgresDBReflection.mapTableDefinitionToType(td, ['CustomType'], options).columns.column
+            .tsType
         ).toEqual('any');
       });
     });

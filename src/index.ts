@@ -65,18 +65,22 @@ async function typescriptOfTable(
   tables: string[],
   schema: string,
   options = new Options()
-) {
+):Promise<string[]> {
   if (typeof db === 'string') {
     db = getDatabase(db);
   }
 
-  const tableTypes = await db.getTablesTypes(tables, schema, options);
+  const enums = await db.getEnumTypes(schema, tables);
+  const enumTypes = generateEnumType(enums, options);
 
-  return tableTypes.map(tableType => {
+  const tableTypes = await db.getTablesTypes(tables, schema, enums, options);
+  const tableInterfaces = tableTypes.map(tableType => {
     let interfaces = generateTableTypes(tableType, options);
     interfaces += generateTableInterface(tableType, options);
     return interfaces;
   });
+
+  return ([] as string[]).concat(enumTypes, tableInterfaces);
 }
 
 export async function typescriptOfSchema(
@@ -99,14 +103,13 @@ export async function typescriptOfSchema(
 
   const options = new Options(userOptions);
 
-  const enumTypes = generateEnumType(await db.getEnumTypes(schema, tables), options);
-  const interfaces = await typescriptOfTable(db, tables, schema as string, options);
+  const interfaces = await typescriptOfTable(db, tables, schema, options);
 
   let output = '/* tslint:disable */\n\n';
   if (options.options.writeHeader) {
     output += buildHeader(db, tables, schema, options.options);
   }
-  output += enumTypes;
+
   output += interfaces.join('');
 
   const configFilePath = await prettier.resolveConfigFile();

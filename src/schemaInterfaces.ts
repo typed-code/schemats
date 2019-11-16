@@ -15,6 +15,10 @@ export interface ITable {
   columns: TableDefinition;
 }
 
+export interface ICustomTypes {
+  [key: string]: string[];
+}
+
 export interface Database {
   connectionString: string;
 
@@ -22,11 +26,16 @@ export interface Database {
 
   getDefaultSchema(): string;
 
-  getEnumTypes(schema?: string, tables?: string[]): Promise<{ [key: string]: string[] }>;
+  getEnumTypes(schema?: string, tables?: string[]): Promise<ICustomTypes>;
 
   getTablesDefinition(tableNames: string[], tableSchema: string): Promise<ITable[]>;
 
-  getTablesTypes(tableName: string[], tableSchema: string, options: Options): Promise<ITable[]>;
+  getTablesTypes(
+    tableName: string[],
+    tableSchema: string,
+    customTypes: ICustomTypes,
+    options: Options
+  ): Promise<ITable[]>;
 
   getSchemaTables(schemaName: string): Promise<string[]>;
 }
