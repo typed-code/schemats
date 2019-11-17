@@ -132,7 +132,11 @@ export class PostgresDatabase implements Database {
     return enums;
   }
 
-  public async getTablesDefinition(tableNames: string[], tableSchema: string): Promise<ITable[]> {
+  public async getTablesDefinition(
+    tableNames: string[],
+    tableSchema: string,
+    customTypes: ICustomTypes
+  ): Promise<ITable[]> {
     interface T {
       table_name: string;
       column_name: string;
@@ -180,7 +184,7 @@ export class PostgresDatabase implements Database {
     options: Options
   ): Promise<ITable[]> {
     const customTypesKeys = keys(customTypes);
-    const tableDefinitions = await this.getTablesDefinition(tableNames, tableSchema);
+    const tableDefinitions = await this.getTablesDefinition(tableNames, tableSchema, customTypes);
 
     return tableDefinitions.map(table =>
       PostgresDatabase.mapTableDefinitionToType(table, customTypesKeys, options)

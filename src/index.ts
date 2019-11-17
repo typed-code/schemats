@@ -110,7 +110,7 @@ export async function typescriptOfSchema(
     output += buildHeader(db, tables, schema, options.options);
   }
 
-  output += interfaces.join('');
+  output += interfaces.join('\n');
 
   const configFilePath = await prettier.resolveConfigFile();
   const prettierOptions = await prettier.resolveConfig(configFilePath || '');

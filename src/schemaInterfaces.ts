@@ -28,7 +28,11 @@ export interface Database {
 
   getEnumTypes(schema?: string, tables?: string[]): Promise<ICustomTypes>;
 
-  getTablesDefinition(tableNames: string[], tableSchema: string): Promise<ITable[]>;
+  getTablesDefinition(
+    tableNames: string[],
+    tableSchema: string,
+    customTypes: ICustomTypes
+  ): Promise<ITable[]>;
 
   getTablesTypes(
     tableName: string[],

@@ -76,9 +76,9 @@ describe('MysqlDatabase', () => {
 
       await mysqlProxy.getEnumTypes('testschema');
       expect(db.mysqlStub.query).toHaveBeenCalledWith(
-        'SELECT column_name, column_type, data_type ' +
+        'SELECT table_name, column_name, column_type, data_type ' +
           'FROM information_schema.columns ' +
-          `WHERE data_type IN ('enum', 'set') and table_schema = ? ORDER BY column_name`,
+          `WHERE data_type IN ('enum', 'set') and table_schema = ? ORDER BY table_name, column_name`,
         ['testschema'],
         expect.any(Function)
       );
@@ -89,9 +89,9 @@ describe('MysqlDatabase', () => {
 
       await mysqlProxy.getEnumTypes();
       expect(db.mysqlStub.query).toHaveBeenCalledWith(
-        'SELECT column_name, column_type, data_type ' +
+        'SELECT table_name, column_name, column_type, data_type ' +
           'FROM information_schema.columns ' +
-          `WHERE data_type IN ('enum', 'set') ORDER BY column_name`,
+          `WHERE data_type IN ('enum', 'set') ORDER BY table_name, column_name`,
         [],
         expect.any(Function)
       );
@@ -142,7 +142,7 @@ describe('MysqlDatabase', () => {
     it('writes correct query', async () => {
       db.mysqlStub.withResults([]);
 
-      await mysqlProxy.getTablesDefinition(['testtable'], 'testschema');
+      await mysqlProxy.getTablesDefinition(['testtable'], 'testschema', {});
       expect(db.mysqlStub.query).toHaveBeenCalledWith(
         'SELECT table_name, column_name, data_type, is_nullable ' +
           'FROM information_schema.columns ' +
@@ -159,7 +159,10 @@ describe('MysqlDatabase', () => {
         { table_name: 'testtable', column_name: 'column3', data_type: 'set', is_nullable: 'YES' },
       ]);
 
-      const schemaTables = await mysqlProxy.getTablesDefinition(['testtable'], 'testschema');
+      const schemaTables = await mysqlProxy.getTablesDefinition(['testtable'], 'testschema', {
+        column2_enum: ['val1', 'val2'],
+        column3_set: ['val']
+      });
       expect(schemaTables).toEqual([
         {
           name: 'testtable',
@@ -201,41 +204,6 @@ describe('MysqlDatabase', () => {
       expect(MysqlDBReflection.mapTableDefinitionToType).toHaveBeenCalledWith(
         { columns: {} },
         ['enum1', 'enum2'],
-        expect.any(Object)
-      );
-    });
-
-    it('gets table definitions', async () => {
-      (MysqlDatabase as any).prototype.getTablesDefinition.mockReturnValue(
-        Promise.resolve([
-          {
-            name: 'tableName',
-            columns: {
-              table: {
-                udtName: 'name',
-                nullable: false,
-              },
-            },
-          },
-        ])
-      );
-      await mysqlProxy.getTablesTypes(['tableName'], 'tableSchema', {}, options);
-      expect(MysqlDBReflection.prototype.getTablesDefinition).toHaveBeenCalledWith(
-        ['tableName'],
-        'tableSchema'
-      );
-      expect(MysqlDBReflection.mapTableDefinitionToType).toHaveBeenCalledWith(
-        {
-          name: 'tableName',
-          columns: {
-            table: {
-              udtName: 'name',
-              nullable: false,
-              tsType: 'any',
-            },
-          },
-        },
-        [],
         expect.any(Object)
       );
     });

@@ -67,4 +67,22 @@ describe('Type generation for MySQL', () => {
 
     expect(res).toContain(`export type type_enum = 'digital' | 'physical';`);
   });
+
+  it('should resolve enum name collisions', async() => {
+    const ordersTable = new MysqlTableBuilder('orders').with
+      .column('id', 'int')
+      .with.enum('type', ['pending', 'paid'])
+      .build();
+
+    const schema = 'schemaName';
+    driver.given
+      .table(schema, aUsersTable)
+      .given.table(schema, aProductsTable)
+      .given.table(schema, ordersTable);
+
+    const res = await typescriptOfSchema('mysql://', [], schema);
+
+    expect(res).toContain(`export type products_type_enum = 'digital' | 'physical';`);
+    expect(res).toContain(`export type orders_type_enum = 'paid' | 'pending';`);
+  });
 });

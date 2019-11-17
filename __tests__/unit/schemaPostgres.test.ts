@@ -127,40 +127,6 @@ describe('PostgresDatabase', () => {
         expect.anything()
       );
     });
-
-    it('gets table definitions', async () => {
-      PostgresProxy.getEnumTypes.mockReturnValue(Promise.resolve({}));
-      PostgresProxy.getTablesDefinition.mockReturnValue(
-        Promise.resolve([
-          {
-            name: 'tableName',
-            columns: {
-              table: {
-                udtName: 'name',
-                nullable: false,
-              },
-            },
-          },
-        ])
-      );
-      await PostgresProxy.getTablesTypes(['tableName'], 'tableSchema');
-
-      expect(PostgresProxy.getTablesDefinition).toHaveBeenCalledWith(['tableName'], 'tableSchema');
-      expect(PostgresDBReflection.mapTableDefinitionToType).toHaveBeenCalledWith(
-        {
-          name: 'tableName',
-          columns: {
-            table: {
-              udtName: 'name',
-              nullable: false,
-              tsType: 'string',
-            },
-          },
-        },
-        [],
-        undefined
-      );
-    });
   });
 
   describe('getSchemaTables', () => {

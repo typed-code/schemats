@@ -37,7 +37,9 @@ export class MysqlDriver {
       .filter(table => tableNames.length === 0 || tableNames.includes(table.name))
       .reduce(
         (rows, table) =>
-          rows.concat(table.columns.filter(c => c.data_type === 'enum' || c.data_type === 'set')),
+          rows
+            .concat(table.columns.filter(c => c.data_type === 'enum' || c.data_type === 'set'))
+            .map((c: any) => ({ table_name: table.name, ...c })),
         [] as any
       );
   }

@@ -104,10 +104,7 @@ export class MysqlDatabase implements Database {
     return this.queryAsync<T>(queryString);
   }
 
-  public async getEnumTypes(
-    schema?: string,
-    tables: string[] = []
-  ): Promise<{ [key: string]: string[] }> {
+  public async getEnumTypes(schema?: string, tables: string[] = []): Promise<ICustomTypes> {
     let additionWhereClause: string = '';
     const params: string[] = [];
     if (schema) {
@@ -121,39 +118,54 @@ export class MysqlDatabase implements Database {
     }
 
     const rawEnumRecords = await this.queryAsync<{
+      table_name: string;
       column_name: string;
       column_type: string;
       data_type: string;
     }>(
-      'SELECT column_name, column_type, data_type ' +
+      'SELECT table_name, column_name, column_type, data_type ' +
         'FROM information_schema.columns ' +
-        `WHERE data_type IN ('enum', 'set') ${additionWhereClause}ORDER BY column_name`,
+        `WHERE data_type IN ('enum', 'set') ${additionWhereClause}ORDER BY table_name, column_name`,
       params
     );
 
-    return rawEnumRecords.reduce((enums, enumItem) => {
-      const enumName = MysqlDatabase.getEnumNameFromColumn(
-        enumItem.data_type,
-        enumItem.column_name
-      );
-      const enumValues = MysqlDatabase.parseMysqlEnumeration(enumItem.column_type);
+    const groupedEnums = rawEnumRecords.reduce(
+      (enums, { table_name, column_name, data_type, column_type }) => {
+        const enumName = MysqlDatabase.getEnumNameFromColumn(data_type, column_name);
+        const enumValues = MysqlDatabase.parseMysqlEnumeration(column_type);
 
-      if (enums[enumName] && !isEqual(enums[enumName], enumValues)) {
-        const errorMsg =
-          `Multiple enums with the same name and contradicting types were found: ` +
-          `${enumItem.column_name}: ${JSON.stringify(enums[enumName])} and ${JSON.stringify(
-            enumValues
-          )}`;
-        throw new Error(errorMsg);
+        enums[enumName] = enums[enumName] || {};
+        enums[enumName][table_name] = enumValues;
+
+        return enums;
+      },
+      ({} as unknown) as { [enumName: string]: { [tableName: string]: string[] } }
+    );
+
+    return Object.entries(groupedEnums).reduce((result, [enumName, tablesMap]) => {
+      const tableKeys = Object.keys(tablesMap);
+      const firstTableValues = tablesMap[tableKeys[0]];
+      const allValuesSame = tableKeys.every(tableKey =>
+        isEqual(tablesMap[tableKey], firstTableValues)
+      );
+
+      if (tableKeys.length === 1 || allValuesSame) {
+        result[enumName] = tablesMap[tableKeys[0]];
+      } else {
+        tableKeys.forEach(tableKey => {
+          result[`${tableKey}_${enumName}`] = tablesMap[tableKey];
+        });
       }
 
-      enums[enumName] = enumValues;
-
-      return enums;
-    }, {} as any);
+      return result;
+    }, ({} as unknown) as ICustomTypes);
   }
 
-  public async getTablesDefinition(tableNames: string[], tableSchema: string): Promise<ITable[]> {
+  public async getTablesDefinition(
+    tableNames: string[],
+    tableSchema: string,
+    customTypes: ICustomTypes
+  ): Promise<ITable[]> {
     const params = [tableSchema];
     let whereClauseAddition = '';
 
@@ -185,9 +197,13 @@ export class MysqlDatabase implements Database {
 
         const table = result[table_name];
 
+        const enumName = MysqlDatabase.getEnumNameFromColumn(data_type, column_name);
+
         table.columns[column_name] = {
           udtName: /^(enum|set)$/i.test(data_type)
-            ? MysqlDatabase.getEnumNameFromColumn(data_type, column_name)
+            ? customTypes.hasOwnProperty(enumName)
+              ? enumName
+              : `${table_name}_${enumName}`
             : data_type,
           nullable: is_nullable === 'YES',
           tsType: '',
@@ -209,7 +225,7 @@ export class MysqlDatabase implements Database {
   ): Promise<ITable[]> {
     const customTypesKeys = keys(customTypes);
 
-    const tableDefinitions = await this.getTablesDefinition(tableNames, tableSchema);
+    const tableDefinitions = await this.getTablesDefinition(tableNames, tableSchema, customTypes);
 
     return tableDefinitions.map(table =>
       MysqlDatabase.mapTableDefinitionToType(table, customTypesKeys, options)
