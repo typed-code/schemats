@@ -43,6 +43,14 @@ exports[`Typescript generateTableTypes empty table definition object 1`] = `
 "
 `;
 
+exports[`Typescript generateTableTypes should allows to override types 1`] = `
+"
+  export namespace tableNameFields {
+    export type col1 = {width: number; height: number;} | null;
+  }
+"
+`;
+
 exports[`Typescript generateTableTypes with nullable column definitions 1`] = `
 "
   export namespace tableNameFields {

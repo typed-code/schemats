@@ -21,7 +21,7 @@ export function generateTableInterface(tableDefinition: ITable, options: Options
   const tableName = options.transformTypeName(tableDefinition.name);
 
   const members = Object.keys(tableDefinition.columns)
-    .map(c => options.transformColumnName(c))
+    .map((c) => options.transformColumnName(c))
     .reduce((result, columnName) => {
       result.push(`${columnName}: ${tableName}Fields.${normalizeName(columnName, options)};`);
 
@@ -41,7 +41,7 @@ export function generateEnumType(enumObject: { [key: string]: string[] }, option
     enums
       .reduce((result, [enumNameRaw, values]) => {
         const enumName = options.transformTypeName(enumNameRaw);
-        result.push(`export type ${enumName} = ${values.map(v => `'${v}'`).join(' | ')};`);
+        result.push(`export type ${enumName} = ${values.map((v) => `'${v}'`).join(' | ')};`);
 
         return result;
       }, [] as string[])
@@ -49,12 +49,17 @@ export function generateEnumType(enumObject: { [key: string]: string[] }, option
   );
 }
 
-export function generateTableTypes(tableDefinition: ITable, options: Options) {
+export function generateTableTypes(
+  tableDefinition: ITable,
+  options: Options,
+  userCustomOverrides: Record<string, Record<string, string>> = {}
+) {
   const tableName = options.transformTypeName(tableDefinition.name);
+  const userTableOverrides = userCustomOverrides[tableDefinition.name];
 
   const fields = Object.entries(tableDefinition.columns).reduce(
     (result, [columnNameRaw, definition]) => {
-      const type = definition.tsType;
+      const type = (userTableOverrides && userTableOverrides[columnNameRaw]) || definition.tsType;
       const nullable = definition.nullable ? ' | null' : '';
       const columnName = options.transformColumnName(columnNameRaw);
       result.push(`export type ${normalizeName(columnName, options)} = ${type}${nullable};`);

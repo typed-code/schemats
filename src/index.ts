@@ -64,8 +64,9 @@ async function typescriptOfTable(
   db: Database | string,
   tables: string[],
   schema: string,
-  options = new Options()
-):Promise<string[]> {
+  options = new Options(),
+  userCustomOverrides: Record<string, Record<string, string>>
+): Promise<string[]> {
   if (typeof db === 'string') {
     db = getDatabase(db);
   }
@@ -74,8 +75,8 @@ async function typescriptOfTable(
   const enumTypes = generateEnumType(enums, options);
 
   const tableTypes = await db.getTablesTypes(tables, schema, enums, options);
-  const tableInterfaces = tableTypes.map(tableType => {
-    let interfaces = generateTableTypes(tableType, options);
+  const tableInterfaces = tableTypes.map((tableType) => {
+    let interfaces = generateTableTypes(tableType, options, userCustomOverrides);
     interfaces += generateTableInterface(tableType, options);
     return interfaces;
   });
@@ -87,7 +88,8 @@ export async function typescriptOfSchema(
   db: Database | string,
   tables: string[] = [],
   schema: string | null = null,
-  userOptions: OptionValues = {}
+  userOptions: OptionValues = {},
+  userCustomOverrides: Record<string, Record<string, string>> = {}
 ): Promise<string> {
   if (typeof db === 'string') {
     db = getDatabase(db);
@@ -103,7 +105,7 @@ export async function typescriptOfSchema(
 
   const options = new Options(userOptions);
 
-  const interfaces = await typescriptOfTable(db, tables, schema, options);
+  const interfaces = await typescriptOfTable(db, tables, schema, options, userCustomOverrides);
 
   let output = '/* tslint:disable */\n\n';
   if (options.options.writeHeader) {

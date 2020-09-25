@@ -133,5 +133,20 @@ describe('Typescript', () => {
 
       expect(tableTypes).toMatchSnapshot();
     });
+
+    it('should allows to override types', () => {
+      const tableTypes = Typescript.generateTableTypes(
+        {
+          name: 'tableName',
+          columns: {
+            col1: { udtName: 'image', nullable: true, tsType: 'json' },
+          },
+        },
+        options,
+        { tableName: { col1: `{width: number; height: number;}` } }
+      );
+
+      expect(tableTypes).toMatchSnapshot();
+    });
   });
 });

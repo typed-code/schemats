@@ -21,9 +21,9 @@ export class MysqlDriver {
   private handleQuery(query: string, params: any[], cb: (error: any, results?: any[]) => void) {
     if (query.includes(`WHERE data_type IN ('enum', 'set')`)) {
       cb(null, this.getAllEnums(params));
-    } else if (query.includes(`WHERE table_name = ? and table_schema = ?`)) {
-      cb(null, this.getTableColumns(params[0], params[1]));
-    } else if (query.includes('SELECT table_name')) {
+    } else if (query.includes(`WHERE table_schema = ? and table_name IN (`)) {
+      cb(null, this.getTableColumns(params[0], params.slice(1)));
+    } else if (query.includes('SELECT table_name FROM')) {
       cb(null, this.getSchemaTables(params[0]));
     } else {
       cb(new Error(`Unsupported query: '${query}'`));
@@ -34,21 +34,32 @@ export class MysqlDriver {
     return Object.entries(this.schemas)
       .filter(([schemaKey]) => (schemaName && schemaKey === schemaName) || !schemaName)
       .reduce((tables, [x, schema]) => tables.concat(Object.values(schema)), [] as ITable[])
-      .filter(table => tableNames.length === 0 || tableNames.includes(table.name))
+      .filter((table) => tableNames.length === 0 || tableNames.includes(table.name))
       .reduce(
         (rows, table) =>
           rows
-            .concat(table.columns.filter(c => c.data_type === 'enum' || c.data_type === 'set'))
+            .concat(table.columns.filter((c) => c.data_type === 'enum' || c.data_type === 'set'))
             .map((c: any) => ({ table_name: table.name, ...c })),
         [] as any
       );
   }
 
-  private getTableColumns(tableName: string, schemaName: string) {
-    return this.schemas[schemaName][tableName].columns;
+  private getTableColumns(schemaName: string, tableNames: string[]) {
+    return [...tableNames]
+      .sort((a, z) => a.localeCompare(z))
+      .reduce(
+        (result, tableName) =>
+          result.concat(
+            this.schemas[schemaName][tableName].columns.map((column) => ({
+              table_name: tableName,
+              ...column,
+            }))
+          ),
+        [] as any
+      );
   }
 
   private getSchemaTables(schemaName: string) {
-    return Object.keys(this.schemas[schemaName]).map(tableName => ({ table_name: tableName }));
+    return Object.keys(this.schemas[schemaName]).map((tableName) => ({ table_name: tableName }));
   }
 }

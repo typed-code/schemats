@@ -68,7 +68,7 @@ describe('Type generation for MySQL', () => {
     expect(res).toContain(`export type type_enum = 'digital' | 'physical';`);
   });
 
-  it('should resolve enum name collisions', async() => {
+  it('should resolve enum name collisions', async () => {
     const ordersTable = new MysqlTableBuilder('orders').with
       .column('id', 'int')
       .with.enum('type', ['pending', 'paid'])
@@ -84,5 +84,28 @@ describe('Type generation for MySQL', () => {
 
     expect(res).toContain(`export type products_type_enum = 'digital' | 'physical';`);
     expect(res).toContain(`export type orders_type_enum = 'paid' | 'pending';`);
+  });
+
+  it('should allow override types', async () => {
+    const schema = 'schemaName';
+    const table = 'articles';
+
+    const articlesTable = new MysqlTableBuilder(table).with
+      .column('id', 'int')
+      .with.column('title', 'varchar')
+      .with.column('image', 'json')
+      .build();
+
+    driver.given.table(schema, articlesTable);
+
+    const res = await typescriptOfSchema(
+      'mysql://',
+      [],
+      schema,
+      {},
+      { [table]: { image: `{width: number; height: number;}` } }
+    );
+
+    expect(res).toContain(`export type image = { width: number; height: number }`);
   });
 });
