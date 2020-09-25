@@ -47,6 +47,7 @@ export namespace usersFields {
   export type geometry_col = string;
   export type int_col = number;
   export type integer_col = number;
+  export type json_col = Object;
   export type longblob_col = Buffer;
   export type longtext_col = string;
   export type mediumblob_col = Buffer;
@@ -66,6 +67,7 @@ export namespace usersFields {
   export type nullable_geometry_col = string | null;
   export type nullable_int_col = number | null;
   export type nullable_integer_col = number | null;
+  export type nullable_json_col = Object | null;
   export type nullable_longblob_col = Buffer | null;
   export type nullable_longtext_col = string | null;
   export type nullable_mediumblob_col = Buffer | null;
@@ -109,6 +111,7 @@ export interface users {
   geometry_col: usersFields.geometry_col;
   int_col: usersFields.int_col;
   integer_col: usersFields.integer_col;
+  json_col: usersFields.json_col;
   longblob_col: usersFields.longblob_col;
   longtext_col: usersFields.longtext_col;
   mediumblob_col: usersFields.mediumblob_col;
@@ -128,6 +131,7 @@ export interface users {
   nullable_geometry_col: usersFields.nullable_geometry_col;
   nullable_int_col: usersFields.nullable_int_col;
   nullable_integer_col: usersFields.nullable_integer_col;
+  nullable_json_col: usersFields.nullable_json_col;
   nullable_longblob_col: usersFields.nullable_longblob_col;
   nullable_longtext_col: usersFields.nullable_longtext_col;
   nullable_mediumblob_col: usersFields.nullable_mediumblob_col;
@@ -205,6 +209,7 @@ export namespace UsersFields {
   export type geometryCol = string;
   export type intCol = number;
   export type integerCol = number;
+  export type jsonCol = Object;
   export type longblobCol = Buffer;
   export type longtextCol = string;
   export type mediumblobCol = Buffer;
@@ -224,6 +229,7 @@ export namespace UsersFields {
   export type nullableGeometryCol = string | null;
   export type nullableIntCol = number | null;
   export type nullableIntegerCol = number | null;
+  export type nullableJsonCol = Object | null;
   export type nullableLongblobCol = Buffer | null;
   export type nullableLongtextCol = string | null;
   export type nullableMediumblobCol = Buffer | null;
@@ -267,6 +273,7 @@ export interface Users {
   geometryCol: UsersFields.geometryCol;
   intCol: UsersFields.intCol;
   integerCol: UsersFields.integerCol;
+  jsonCol: UsersFields.jsonCol;
   longblobCol: UsersFields.longblobCol;
   longtextCol: UsersFields.longtextCol;
   mediumblobCol: UsersFields.mediumblobCol;
@@ -286,6 +293,7 @@ export interface Users {
   nullableGeometryCol: UsersFields.nullableGeometryCol;
   nullableIntCol: UsersFields.nullableIntCol;
   nullableIntegerCol: UsersFields.nullableIntegerCol;
+  nullableJsonCol: UsersFields.nullableJsonCol;
   nullableLongblobCol: UsersFields.nullableLongblobCol;
   nullableLongtextCol: UsersFields.nullableLongtextCol;
   nullableMediumblobCol: UsersFields.nullableMediumblobCol;

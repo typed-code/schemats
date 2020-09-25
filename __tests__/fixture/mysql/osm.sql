@@ -64,7 +64,10 @@ CREATE TABLE users (
     enum_col enum('enum1', 'enum2', 'enum3') DEFAULT 'enum1' NOT NULL,
     nullable_enum_col enum('enum1', 'enum2', 'enum3'),
     set_col set('set1', 'set2', 'set3') DEFAULT 'set1' NOT NULL,
-    nullable_set_col set('set1', 'set2', 'set3')
+    nullable_set_col set('set1', 'set2', 'set3'),
+
+    json_col json NOT NULL,
+    nullable_json_col json
 );
 
 DROP TABLE IF EXISTS user_enums;
