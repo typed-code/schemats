@@ -1,6 +1,6 @@
 {
   "name": "@typed-code/schemats",
-  "version": "4.2.4",
+  "version": "4.3.0",
   "description": "Generate typescript interface definitions from (Postgres or MySql) SQL database schema",
   "keywords": [
     "postgres",
