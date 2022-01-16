@@ -14,7 +14,7 @@ function pgpStubFactory(shouldReturnMockHandler = false) {
     return {
       withStubEachResults: (results: any[]) => {
         pgpStub.each.mockImplementation((query, params, cb) => {
-          return new Promise(resolve => {
+          return new Promise<void>((resolve) => {
             results.forEach(cb);
             resolve();
           });
