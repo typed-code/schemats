@@ -9,7 +9,7 @@ jobs:
   build:
     docker:
       # specify the version you desire here
-      - image: circleci/node:12.2.0
+      - image: circleci/node:16.19.0
         environment:
           MYSQL_URL: mysql://user:passw0rd@127.0.0.1/test_db
           POSTGRES_URL: postgres://postgres@127.0.0.1/test_db
