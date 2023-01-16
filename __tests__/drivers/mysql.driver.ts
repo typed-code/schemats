@@ -19,7 +19,7 @@ export class MysqlDriver {
   }
 
   private handleQuery(query: string, params: any[], cb: (error: any, results?: any[]) => void) {
-    if (query.includes(`WHERE data_type IN ('enum', 'set')`)) {
+    if (query.includes(`WHERE data_type IN ('enum', 'set') and table_schema = ?`)) {
       cb(null, this.getAllEnums(params));
     } else if (query.includes(`WHERE table_schema = ? and table_name IN (`)) {
       cb(null, this.getTableColumns(params[0], params.slice(1)));

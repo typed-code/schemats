@@ -24,7 +24,7 @@ export class MysqlDatabase implements Database {
       throw new Error('No options given');
     }
 
-    tableDefinition.columns = mapValues(tableDefinition.columns, column => {
+    tableDefinition.columns = mapValues(tableDefinition.columns, (column) => {
       switch (column.udtName) {
         case 'char':
         case 'varchar':
@@ -105,15 +105,15 @@ export class MysqlDatabase implements Database {
   }
 
   public async getEnumTypes(schema?: string, tables: string[] = []): Promise<ICustomTypes> {
-    let additionWhereClause: string = '';
+    const additionWhereClause: string[] = [`data_type IN ('enum', 'set')`];
     const params: string[] = [];
     if (schema) {
-      additionWhereClause = `and table_schema = ? `;
+      additionWhereClause.push(`table_schema = ?`);
       params.push(schema);
     }
 
     if (tables.length > 0) {
-      additionWhereClause = `and table_name in (${tables.map(_ => '?').join(',')}) `;
+      additionWhereClause.push(`table_name in (${tables.map((_) => '?').join(',')})`);
       params.push(...tables);
     }
 
@@ -125,7 +125,7 @@ export class MysqlDatabase implements Database {
     }>(
       'SELECT table_name, column_name, column_type, data_type ' +
         'FROM information_schema.columns ' +
-        `WHERE data_type IN ('enum', 'set') ${additionWhereClause}ORDER BY table_name, column_name`,
+        `WHERE ${additionWhereClause.join(' and ')} ORDER BY table_name, column_name`,
       params
     );
 
@@ -139,26 +139,26 @@ export class MysqlDatabase implements Database {
 
         return enums;
       },
-      ({} as unknown) as { [enumName: string]: { [tableName: string]: string[] } }
+      {} as unknown as { [enumName: string]: { [tableName: string]: string[] } }
     );
 
     return Object.entries(groupedEnums).reduce((result, [enumName, tablesMap]) => {
       const tableKeys = Object.keys(tablesMap);
       const firstTableValues = tablesMap[tableKeys[0]];
-      const allValuesSame = tableKeys.every(tableKey =>
+      const allValuesSame = tableKeys.every((tableKey) =>
         isEqual(tablesMap[tableKey], firstTableValues)
       );
 
       if (tableKeys.length === 1 || allValuesSame) {
         result[enumName] = tablesMap[tableKeys[0]];
       } else {
-        tableKeys.forEach(tableKey => {
+        tableKeys.forEach((tableKey) => {
           result[`${tableKey}_${enumName}`] = tablesMap[tableKey];
         });
       }
 
       return result;
-    }, ({} as unknown) as ICustomTypes);
+    }, {} as unknown as ICustomTypes);
   }
 
   public async getTablesDefinition(
@@ -171,7 +171,7 @@ export class MysqlDatabase implements Database {
 
     if (tableNames.length) {
       params.push(...tableNames);
-      whereClauseAddition = `and table_name IN (${tableNames.map(_ => '?').join(',')}) `;
+      whereClauseAddition = `and table_name IN (${tableNames.map((_) => '?').join(',')}) `;
     }
 
     const tableColumns = await this.queryAsync<{
@@ -211,7 +211,7 @@ export class MysqlDatabase implements Database {
 
         return result;
       },
-      ({} as unknown) as { [tableName: string]: ITable }
+      {} as unknown as { [tableName: string]: ITable }
     );
 
     return Object.values(tablesMap);
@@ -227,7 +227,7 @@ export class MysqlDatabase implements Database {
 
     const tableDefinitions = await this.getTablesDefinition(tableNames, tableSchema, customTypes);
 
-    return tableDefinitions.map(table =>
+    return tableDefinitions.map((table) =>
       MysqlDatabase.mapTableDefinitionToType(table, customTypesKeys, options)
     );
   }
