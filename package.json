@@ -41,7 +41,7 @@
     "clean": "del-cli node_modules **/*.js",
     "lint": "tslint --project tsconfig.json --fix",
     "prepublish": "npm run build",
-    "release": "release-it",
+    "release": "release-it --only-version",
     "pretest": "npm run lint && npm run build",
     "test": "jest",
     "version": "auto-changelog -p && git add CHANGELOG.md"
