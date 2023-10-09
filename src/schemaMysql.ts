@@ -201,7 +201,7 @@ export class MysqlDatabase implements Database {
 
         table.columns[column_name] = {
           udtName: /^(enum|set)$/i.test(data_type)
-            ? customTypes.hasOwnProperty(enumName)
+            ? enumName in customTypes
               ? enumName
               : `${table_name}_${enumName}`
             : data_type,

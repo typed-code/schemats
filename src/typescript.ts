@@ -2,9 +2,6 @@
  * Generate typescript interface from table schema
  * Created by xiamx on 2016-08-10.
  */
-
-import * as _ from 'lodash';
-
 import { Options } from './options';
 import { ITable } from './schemaInterfaces';
 
@@ -13,7 +10,7 @@ function nameIsReservedKeyword(name: string): boolean {
   return reservedKeywords.indexOf(name) !== -1;
 }
 
-function normalizeName(name: string, options: Options): string {
+function normalizeName(name: string, _options: Options): string {
   return nameIsReservedKeyword(name) ? name + '_' : name;
 }
 

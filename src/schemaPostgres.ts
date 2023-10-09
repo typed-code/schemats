@@ -7,7 +7,7 @@ import { Database, ICustomTypes, ITable } from './schemaInterfaces';
 const pgp = PgPromise();
 
 export class PostgresDatabase implements Database {
-  private db: PgPromise.IDatabase<{}>;
+  private db: PgPromise.IDatabase<Record<string, any>>;
 
   constructor(public connectionString: string) {
     this.db = pgp(connectionString);
@@ -18,7 +18,7 @@ export class PostgresDatabase implements Database {
     customTypes: string[],
     options: Options
   ): ITable {
-    tableDefinition.columns = mapValues(tableDefinition.columns, column => {
+    tableDefinition.columns = mapValues(tableDefinition.columns, (column) => {
       switch (column.udtName) {
         case 'bpchar':
         case 'char':
@@ -105,14 +105,14 @@ export class PostgresDatabase implements Database {
 
   public async getEnumTypes(
     schema?: string,
-    tables: string[] = []
+    _tables: string[] = []
   ): Promise<{ [key: string]: string[] }> {
     interface T {
       name: string;
       value: any;
     }
 
-    const enums: any = {};
+    const enums: Record<string, string[]> = {};
     const enumSchemaWhereClause = schema ? pgp.as.format(`where n.nspname = $1`, schema) : '';
     await this.db.each<T>(
       'select n.nspname as schema, t.typname as name, e.enumlabel as value ' +
@@ -135,7 +135,7 @@ export class PostgresDatabase implements Database {
   public async getTablesDefinition(
     tableNames: string[],
     tableSchema: string,
-    customTypes: ICustomTypes
+    _customTypes: ICustomTypes
   ): Promise<ITable[]> {
     interface T {
       table_name: string;
@@ -186,7 +186,7 @@ export class PostgresDatabase implements Database {
     const customTypesKeys = keys(customTypes);
     const tableDefinitions = await this.getTablesDefinition(tableNames, tableSchema, customTypes);
 
-    return tableDefinitions.map(table =>
+    return tableDefinitions.map((table) =>
       PostgresDatabase.mapTableDefinitionToType(table, customTypesKeys, options)
     );
   }

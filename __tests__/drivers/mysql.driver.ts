@@ -33,7 +33,7 @@ export class MysqlDriver {
   private getAllEnums([schemaName, ...tableNames]: string[]): IColumn[] {
     return Object.entries(this.schemas)
       .filter(([schemaKey]) => (schemaName && schemaKey === schemaName) || !schemaName)
-      .reduce((tables, [x, schema]) => tables.concat(Object.values(schema)), [] as ITable[])
+      .reduce((tables, [_x, schema]) => tables.concat(Object.values(schema)), [] as ITable[])
       .filter((table) => tableNames.length === 0 || tableNames.includes(table.name))
       .reduce(
         (rows, table) =>
