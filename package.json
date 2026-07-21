@@ -34,7 +34,7 @@
     "dist/bin/**/*"
   ],
   "engines": {
-    "node": "<16"
+    "node": ">=22"
   },
   "scripts": {
     "build": "tsc",
