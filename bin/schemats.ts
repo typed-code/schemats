@@ -4,8 +4,8 @@
  * Created by xiamx on 2016-08-10.
  */
 
-import * as fs from 'fs';
-import * as yargs from 'yargs';
+import fs from 'node:fs';
+import yargs from 'yargs';
 import { typescriptOfSchema } from '../src';
 
 interface SchematsConfig {

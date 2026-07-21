@@ -55,7 +55,7 @@ describe('schema generation integration testing', () => {
           db
         );
       } catch (e) {
-        expect(e.message).toEqual(
+        expect((e as Error).message).toEqual(
           'Multiple enums with the same name and contradicting types were found: location_type: ["city","country","province"] and ["city","country","state"]'
         );
       }

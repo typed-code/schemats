@@ -1,4 +1,4 @@
-import * as pgp from 'pg-promise';
+import pgp from 'pg-promise';
 import { Options } from '../../src/options';
 import { ITable } from '../../src/schemaInterfaces';
 import { PostgresDatabase } from '../../src/schemaPostgres';
@@ -167,7 +167,7 @@ describe('PostgresDatabase', () => {
         'timetz',
         'interval',
         'name',
-      ].forEach(type =>
+      ].forEach((type) =>
         it(type, () => {
           const td: ITable = {
             name: 'tableName',
@@ -187,7 +187,7 @@ describe('PostgresDatabase', () => {
     });
 
     describe('maps to number', () => {
-      ['int2', 'int4', 'int8', 'float4', 'float8', 'numeric', 'money', 'oid'].forEach(type =>
+      ['int2', 'int4', 'int8', 'float4', 'float8', 'numeric', 'money', 'oid'].forEach((type) =>
         it(type, () => {
           const td: ITable = {
             name: 'tableName',
@@ -225,7 +225,7 @@ describe('PostgresDatabase', () => {
     });
 
     describe('maps to Object', () => {
-      ['json', 'jsonb'].forEach(type =>
+      ['json', 'jsonb'].forEach((type) =>
         it(type, () => {
           const td: ITable = {
             name: 'tableName',
@@ -245,7 +245,7 @@ describe('PostgresDatabase', () => {
     });
 
     describe('maps to Date', () => {
-      ['date', 'timestamp', 'timestamptz'].forEach(type =>
+      ['date', 'timestamp', 'timestamptz'].forEach((type) =>
         it(type, () => {
           const td: ITable = {
             name: 'tableName',
@@ -265,7 +265,7 @@ describe('PostgresDatabase', () => {
     });
 
     describe('maps to Array<number>', () => {
-      ['_int2', '_int4', '_int8', '_float4', '_float8', '_numeric', '_money'].forEach(type =>
+      ['_int2', '_int4', '_int8', '_float4', '_float8', '_numeric', '_money'].forEach((type) =>
         it(type, () => {
           const td: ITable = {
             name: 'tableName',
@@ -304,7 +304,7 @@ describe('PostgresDatabase', () => {
     });
 
     describe('maps to Array<string>', () => {
-      ['_varchar', '_text', '_citext', '_uuid', '_bytea'].forEach(type =>
+      ['_varchar', '_text', '_citext', '_uuid', '_bytea'].forEach((type) =>
         it(type, () => {
           const td: ITable = {
             name: 'tableName',
@@ -324,7 +324,7 @@ describe('PostgresDatabase', () => {
     });
 
     describe('maps to Array<Object>', () => {
-      ['_json', '_jsonb'].forEach(type =>
+      ['_json', '_jsonb'].forEach((type) =>
         it(type, () => {
           const td: ITable = {
             name: 'tableName',

@@ -6,7 +6,7 @@ describe('Schema', () => {
       try {
         getDatabase('mongodb://localhost:27017');
       } catch (e) {
-        expect(e.message).toEqual(
+        expect((e as Error).message).toEqual(
           'SQL version unsupported in connection: mongodb://localhost:27017'
         );
       }

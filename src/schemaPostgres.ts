@@ -1,5 +1,5 @@
 import { keys, mapValues } from 'lodash';
-import * as PgPromise from 'pg-promise';
+import PgPromise from 'pg-promise';
 import { Options } from './options';
 
 import { Database, ICustomTypes, ITable } from './schemaInterfaces';

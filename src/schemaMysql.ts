@@ -249,7 +249,7 @@ export class MysqlDatabase implements Database {
 
   private queryAsync<T = object>(queryString: string, escapedValues?: string[]): Promise<T[]> {
     return new Promise((resolve, reject) => {
-      this.db.query(queryString, escapedValues, (error: MysqlError, results: T[]) => {
+      this.db.query(queryString, escapedValues, (error: MysqlError | null, results: T[]) => {
         if (error) {
           return reject(error);
         }

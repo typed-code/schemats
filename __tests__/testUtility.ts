@@ -43,14 +43,14 @@ export async function writeTypesOf(
 
 export function condDescribe(cond: boolean, context: any, ...args: any[]) {
   if (cond) {
-    describe.apply(context, args);
+    describe.apply(context, args as any);
   } else {
-    describe.skip.apply(context, args);
+    describe.skip.apply(context, args as any);
   }
 }
 
 export function condBeforeAll(cond: boolean, context: any, ...args: any[]) {
   if (cond) {
-    beforeAll.apply(context, args);
+    beforeAll.apply(context, args as any);
   }
 }

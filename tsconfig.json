@@ -3,7 +3,7 @@
   "display": "Node 22",
   "compilerOptions": {
     "lib": ["es2023"],
-    "module": "commonjs",
+    "module": "node20",
     "target": "es2022",
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
@@ -11,9 +11,11 @@
     "noImplicitAny": true,
     "declaration": true,
     "strictNullChecks": true,
+    "esModuleInterop": true,
     "newLine": "LF",
     "sourceMap": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node16",
+    "types": ["node", "jest"]
   },
   "exclude": [
     "node_modules",

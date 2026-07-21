@@ -131,7 +131,7 @@ describe('MysqlDatabase', () => {
       try {
         await mysqlProxy.getEnumTypes('testschema');
       } catch (e) {
-        expect(e.message).toEqual(
+        expect((e as Error).message).toEqual(
           'Multiple enums with the same name and contradicting types were found: column1: ["enum1"] and ["enum2"]'
         );
       }
@@ -161,7 +161,7 @@ describe('MysqlDatabase', () => {
 
       const schemaTables = await mysqlProxy.getTablesDefinition(['testtable'], 'testschema', {
         column2_enum: ['val1', 'val2'],
-        column3_set: ['val']
+        column3_set: ['val'],
       });
       expect(schemaTables).toEqual([
         {
@@ -245,7 +245,7 @@ describe('MysqlDatabase', () => {
         'geometry',
         'set',
         'enum',
-      ].forEach(type =>
+      ].forEach((type) =>
         it(type, () => {
           const td: ITable = {
             name: 'tableName',
@@ -276,7 +276,7 @@ describe('MysqlDatabase', () => {
         'numeric',
         'float',
         'year',
-      ].forEach(type =>
+      ].forEach((type) =>
         it(type, () => {
           const td: ITable = {
             name: 'tableName',
@@ -332,7 +332,7 @@ describe('MysqlDatabase', () => {
     });
 
     describe('maps to Date', () => {
-      ['date', 'datetime', 'timestamp'].forEach(type =>
+      ['date', 'datetime', 'timestamp'].forEach((type) =>
         it(type, () => {
           const td: ITable = {
             name: 'tableName',
@@ -352,7 +352,7 @@ describe('MysqlDatabase', () => {
     });
 
     describe('maps to Buffer', () => {
-      ['tinyblob', 'mediumblob', 'longblob', 'blob', 'binary', 'varbinary', 'bit'].forEach(type =>
+      ['tinyblob', 'mediumblob', 'longblob', 'blob', 'binary', 'varbinary', 'bit'].forEach((type) =>
         it(type, () => {
           const td: ITable = {
             name: 'tableName',
