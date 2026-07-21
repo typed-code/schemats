@@ -1,4 +1,4 @@
-import * as pgress from 'pg-promise';
+import pgress from 'pg-promise';
 import { Database, getDatabase } from '../../../src/index';
 import { condBeforeAll, condDescribe, generateTypes, loadSchema } from '../../testUtility';
 

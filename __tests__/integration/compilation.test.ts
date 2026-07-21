@@ -1,4 +1,4 @@
-import * as pgress from 'pg-promise';
+import pgress from 'pg-promise';
 import * as ts from 'typescript';
 import { Database, getDatabase } from '../../src';
 import { compile, condBeforeAll, condDescribe, writeTypesOf } from '../testUtility';
@@ -27,8 +27,9 @@ describe('end user use case', () => {
         compile(['./__tests__/fixture/postgres/usecase.ts'], {
           noEmitOnError: true,
           noImplicitAny: true,
-          target: ts.ScriptTarget.ES5,
+          target: ts.ScriptTarget.ES2020,
           module: ts.ModuleKind.CommonJS,
+          types: ['node'],
         })
       ).toBe(true);
     });

@@ -1,4 +1,4 @@
-import * as PgPromise from 'pg-promise';
+import PgPromise = require('pg-promise');
 import { customers } from '../../actual/postgres/usecase';
 
 const pgp = PgPromise();
