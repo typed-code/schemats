@@ -1,0 +1,73 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: rootpw
+          MYSQL_DATABASE: test_db
+          MYSQL_USER: user
+          MYSQL_PASSWORD: passw0rd
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd "mysqladmin ping -h localhost"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
+      postgres:
+        image: postgres:11
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_DB: test_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      MYSQL_URL: mysql://user:passw0rd@127.0.0.1/test_db
+      POSTGRES_URL: postgres://postgres@127.0.0.1/test_db
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Configure MySQL auth
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq mysql-client
+          mysql -u root -prootpw -h 127.0.0.1 -e "ALTER USER 'user'@'%' IDENTIFIED WITH mysql_native_password BY 'passw0rd'; FLUSH PRIVILEGES;"
+
+      - name: Wait for MySQL
+        run: |
+          for i in $(seq 1 30); do
+            nc -z 127.0.0.1 3306 && echo "MySQL ready" && exit 0
+            echo -n .
+            sleep 1
+          done
+          echo "Failed waiting for MySQL" && exit 1
+
+      - name: Run tests
+        run: npm test
