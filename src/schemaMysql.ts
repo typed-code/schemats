@@ -1,15 +1,30 @@
 import { isEqual, keys, mapValues } from 'lodash';
-import { Connection, createConnection, MysqlError } from 'mysql';
+import type { Connection, MysqlError } from 'mysql';
 import { parse as urlParse } from 'url';
 import { Options } from './options';
 import { Database, ICustomTypes, ITable } from './schemaInterfaces';
+
+function loadMysql() {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    return require('mysql') as {
+      createConnection: (connectionString: string) => Connection;
+    };
+  } catch {
+    throw new Error(
+      'mysql is required to connect to MySQL databases. ' +
+        'Install it: npm install mysql'
+    );
+  }
+}
 
 export class MysqlDatabase implements Database {
   private db: Connection;
   private readonly defaultSchema: string;
 
   constructor(public connectionString: string) {
-    this.db = createConnection(connectionString);
+    const mysql = loadMysql();
+    this.db = mysql.createConnection(connectionString);
     const url = urlParse(connectionString, true);
     this.defaultSchema = url && url.pathname ? url.pathname.substr(1) : 'public';
   }

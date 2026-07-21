@@ -1,16 +1,28 @@
 import { keys, mapValues } from 'lodash';
-import PgPromise from 'pg-promise';
+import type pgPromise from 'pg-promise';
 import { Options } from './options';
 
 import { Database, ICustomTypes, ITable } from './schemaInterfaces';
 
-const pgp = PgPromise();
+function loadPgPromise(): ReturnType<typeof pgPromise> {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const mod = require('pg-promise');
+    const pgpMod = (mod.default || mod) as typeof pgPromise;
+    return pgpMod();
+  } catch {
+    throw new Error(
+      'pg-promise is required to connect to PostgreSQL databases. ' +
+        'Install it: npm install pg-promise'
+    );
+  }
+}
 
 export class PostgresDatabase implements Database {
-  private db: PgPromise.IDatabase<Record<string, any>>;
+  private db: pgPromise.IDatabase<Record<string, any>>;
 
   constructor(public connectionString: string) {
-    this.db = pgp(connectionString);
+    this.db = loadPgPromise()(connectionString);
   }
 
   private static mapTableDefinitionToType(
@@ -113,7 +125,7 @@ export class PostgresDatabase implements Database {
     }
 
     const enums: Record<string, string[]> = {};
-    const enumSchemaWhereClause = schema ? pgp.as.format(`where n.nspname = $1`, schema) : '';
+    const enumSchemaWhereClause = schema ? loadPgPromise().as.format(`where n.nspname = $1`, schema) : '';
     await this.db.each<T>(
       'select n.nspname as schema, t.typname as name, e.enumlabel as value ' +
         'from pg_type t ' +

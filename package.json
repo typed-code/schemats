@@ -48,16 +48,28 @@
   },
   "dependencies": {
     "lodash": "^4.18.1",
-    "mysql": "^2.18.1",
-    "pg-promise": "^11.5.4",
     "pkg-up": "^3.1.0",
     "prettier": "^2.8.8",
     "typescript": "^6.0.3",
     "yargs": "^17.6.2"
   },
+  "peerDependencies": {
+    "mysql": "^2.18.1",
+    "pg-promise": "^11.5.4"
+  },
+  "peerDependenciesMeta": {
+    "mysql": {
+      "optional": true
+    },
+    "pg-promise": {
+      "optional": true
+    }
+  },
   "devDependencies": {
     "@swc/jest": "^0.2.39",
     "@swc/core": "^1.15.46",
+    "mysql": "^2.18.1",
+    "pg-promise": "^11.5.4",
     "@types/jest": "^29.2.5",
     "@types/lodash": "^4.14.191",
     "@types/mysql": "2.15.21",
